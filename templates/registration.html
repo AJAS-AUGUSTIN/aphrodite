@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registration</title>
+
+    <script>
+        function validate(){
+            console.log("hi")
+            let first_name = document.getElementById('first_name').value;
+            console.log(first_name)
+            let last_name = document.getElementById('last_name').value;
+            let username = document.getElementById('username').value;
+            let email = document.getElementById('email').value;
+            let password1 = document.getElementById('password1').value;
+            let password2 = document.getElementById('password2').value;
+            let phone_number = document.getElementById('phone_number').value;
+            let error_message = document.getElementById('error_message');
+            let emailRegex = /^[a-zA-Z0-9.!#$%&’+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)$/;
+            
+            error_message.style.padding = "10px"
+                if (first_name == '' || first_name == null) {
+                    mess = "Name cant be empty";
+                    error_message.innerHTML = mess;
+                    return false;
+                }
+                if(!email.match(emailRegex)){
+                    mess = "Enter mail in valid format";
+                    error_message.innerHTML = mess;
+                    return false;
+                }
+                if ( email == '' || email.length < 5 ) {
+                    mess = "Enter valid e-mail";
+                    error_message.innerHTML = mess;
+                    return false;
+                }
+                if ( username.length < 3 ) {
+                    mess = "Enter username greater than 5";
+                    error_message.innerHTML = mess;
+                    return false;
+                }
+                if ( username.length == '' ) {
+                    mess = "Enter username";
+                    error_message.innerHTML = mess;
+                    return false;
+                }
+                if ( password1 == '' ) {
+                    mess = "Enter password";
+                    error_message.innerHTML = mess;
+                    return false;
+                }
+                if ( password2 == '' ) {
+                    mess = "Confirm password";
+                    error_message.innerHTML = mess;
+                    return false;
+                }
+                if ( phone_number == '' || phone_number.length != 10 ) {
+                    mess = "Enter correct Phone Number";
+                    error_message.innerHTML = mess;
+                    return false;
+                }
+                return true;
+            }
+        </script>
+</head>
+<body>
+<!-- <body style="background:-webkit-linear-gradient(left, #08eea9, #b011c5)"> -->
+    <link href="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
+<script src="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+
+<div class="container register-form" style="padding-top: 20px;">
+    <form id="form" action="{% url 'register' %}" method="POST" onsubmit="return validate()">
+                {% csrf_token %}
+                <div class="note">
+                    <p>Welcome to the family</p>
+                </div>
+                <div id="error_message" class="row-row">
+
+                </div>
+
+                <div class="form-content">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <input type="text" id="first_name" name="first_name" placeholder="First Name" class="form-control">
+                            </div>
+                            <div class="form-group">
+                                <input type="text" id="username" name="username" placeholder="User Name" class="form-control">
+                            </div>
+                            <div class="form-group">
+                                <input type="password" id="password1" name="password1" placeholder="Password" class="form-control">
+                            </div>
+                            <div class="form-group">
+                                <input type="tel" id="phone_number" name="phone_number" placeholder="Phone Number" class="form-control">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <input type="text" id="last_name" name="last_name" placeholder="Last Name" class="form-control">
+                            </div>
+                            <div class="form-group">
+                                <input type="text" id="email" name="email" placeholder="E-mail" class="form-control">
+                            </div>
+                            <div class="form-group">
+                                <input type="password" id="password2" name="password2" placeholder="confirm password" class="form-control">
+                            </div>
+                        </div>
+                        <div>
+                            {% for message in messages %}    
+                            <h3>{{ message }}</h3>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    <button type="submit" class="btnSubmit" onclick="validate()">Submit</button>
+                </div>
+            </div>
+        </div>
+    </form>
+    
+</body>
+
+<style>
+    .note
+{
+    text-align: center;
+    height: 80px;
+    background: -webkit-linear-gradient(left, #0072ff, #8811c5);
+    color: #fff;
+    font-weight: bold;
+    line-height: 80px;
+}
+#error_message{
+    margin-bottom: 20px;
+    padding: 0px;
+    background: #fe8b8e;
+    text-align: center;
+    font-size: 14px;
+    transition: all 0.5s ease;
+  }
+.form-content
+{
+    padding: 5%;
+    border: 1px solid #ced4da;
+    margin-bottom: 2%;
+}
+.form-control{
+    border-radius:1.5rem;
+}
+.btnSubmit
+{
+    border:none;
+    border-radius:1.5rem;
+    padding: 1%;
+    width: 20%;
+    cursor: pointer;
+    background: #0062cc;
+    color: #fff;
+}
+</style>
+
+
+
+</html>
+
+
+<!-- <!DOCTYPE html>8000
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registration</title>
+</head>
+<body>
+    <form action="" method="POST">
+        {% csrf_token %}
+        <input type="text" name="first_name" placeholder="First Name"><br>
+        <input type="text" name="last_name" placeholder="Last Name"><br>
+        <input type="text" name="username" placeholder="User Name"><br>
+        <input type="text" name="email" placeholder="E-mail"><br>
+        <input type="text" name="password1" placeholder="Password"><br>
+        <input type="text" name="password2" placeholder="confirm password"><br>
+        <button type="submit">submit</button>
+    </form>
+
+    <div>
+    {% for message in messages %}
+      <h3>{{ message }}</h3>
+      {% endfor %}
+    </div>
+</body>
+</html> -->
