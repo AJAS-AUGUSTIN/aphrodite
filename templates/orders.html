@@ -282,7 +282,7 @@ $(document).ready(function(){
 				<div class="table-title">
 					<div class="row">
 						<div class="col-xs-6">
-							<h2>Manage <b>Category</b></h2>
+							<h2>Manage <b>Orders</b></h2>
 						</div>
 						<div class="col-xs-6">
 							<!-- <a href="adminregistration.html" class="btn btn-success" data-toggle="modal"><i class="material-icons">&#xE147;</i> <span>Add New User</span></a> -->
@@ -299,15 +299,15 @@ $(document).ready(function(){
 									<label for="selectAll"></label>
 								</span> -->
 							</th>
-							<th>Title</th>
-							<th>url-slug</th>
-							<th>Description</th>
-							<th>Created At</th>
-                            <th>Status</th>
+							<th>Id</th>
+							<th>User</th>
+							<th>Delivery Address</th>
+                            <th>Payment method</th>
+							<th>Delivery Status</th>
 
 						</tr>
 					</thead>
-          {% for category in categories %}
+          {% for order in orders %}
 					<tbody>
 						<tr>
 							<td>
@@ -316,15 +316,13 @@ $(document).ready(function(){
 									<label for="checkbox1"></label>
 								</span> -->
 							</td>
-							<td>{{category.title}}</td>
-							<td>{{category.url_slug}}</td>
-							<td>{{category.description}}</td>
-							<td>{{category.created_at}}</td>
-                            <td>{{category.is_active}}</td>
+							<td>{{order.order_id}}</td>
+							<td>{{order.user}}</td>
+							<td>{{order.delivered_address}}</td>
+                            <td>{{order.payment_method}}</td>
+							<td>{{order.delivery_status}}</td>
 							<td>
-								<a href="{% url 'editcategory' category.title %}" class="edit" data-toggle="modal"><i class="material-icons" data-toggle="tooltip" title="Edit">&#xE254;</i></a>
-								<a href="{% url 'delcategory' category.title %}" class="delete" data-toggle="modal"><i class="material-icons" data-toggle="tooltip" title="Delete">&#xE872;</i></a>
-								<!-- <a href="{% url 'statusupdate' user.id %}" class="access" data-toggle="modal"><i class="material-icons" data-toggle="tooltip" title="acess">&#xe14b;</i></a> -->
+								<a href="{% url 'editordersadmin' order.id %}" class="edit" data-toggle="modal"><i class="material-icons" data-toggle="tooltip" title="Edit">&#xE254;</i></a>
 							</td>
 						</tr>
             {% endfor %}

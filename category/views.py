@@ -1,6 +1,7 @@
 from django.shortcuts import render, redirect
+from accounts.models import Account
 import category
-from category.models import Categories, Products, SubCategories
+from category.models import Address, Categories, Products, SubCategories
 from django.contrib import messages
 
 # Create your views here.
@@ -181,6 +182,23 @@ def editproduct(request, id):
     else:
         return render(request, 'editproducts.html',{'product':products,'subcategories':subcategories})
 
-def address(request):
-    return render(request, 'address.html')
+def add_address(request):
+    current_user = request.user
+    user = Account.objects.get(username=current_user)
+    if request.method == 'POST':
+        first_name = request.POST['first_name']
+        last_name = request.POST['last_name']
+        email = request.POST['email']
+        phone_number = request.POST['phone_number']
+        address_line_1 = request.POST['address_line_1']
+        address_line_2 = request.POST['address_line_2']
+        city = request.POST['city']
+        state = request.POST['state']
+        country = request.POST['country']
+        pincode = request.POST['pincode']
+        order_note  = request.POST['order_note']
+        address = Address.objects.create(first_name=first_name,last_name=last_name,email=email,phone_number=phone_number,address_line_1=address_line_1,address_line_2=address_line_2,city=city,state=state,country=country,pincode=pincode,order_note=order_note,user_id=user)
+        return redirect('listaddress')
+    else:
+        return render(request,'address.html')
 

@@ -2,25 +2,27 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.db.models.query_utils import Q
 from django.http.response import HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
+from django.views.decorators.cache import never_cache , cache_control
 from accounts.models import Account
 from category.models import Address
 from category.models import Products
-from category.views import address
-from orders.models import OrderItems, OrderProduct,Order
-from .models import Cart, CartItem, CartItems
+# from category.views import address
+from orders.models import OrderItems,Order
+from .models import Cart, CartItems
 from django.contrib.auth.decorators import login_required
 import json
 import datetime
 import uuid
 
 # Create your views here.
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def _cart_id(request):
     cart = request.session.session_key
     if not cart:
         cart = request.session.create()
         return cart
 
-
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def add_cart(request, id):
     product = Products.objects.get(id=id)
     try:
@@ -32,22 +34,25 @@ def add_cart(request, id):
         cart.save()
 
     try:
-        cart_item = CartItem.objects.get(product=product,cart=cart)
+        cart_item = CartItems.objects.get(product=product,cart=cart)
         cart_item.quantity += 1
         cart_item.save()
-    except CartItem.DoesNotExist:
-        cart_item = CartItem.objects.create(
+    except CartItems.DoesNotExist:
+        cart_item = CartItems.objects.create(
             product = product,
             quantity = 1,
-            cart = cart
+            cart = cart,
+            user_id=request.user.id,
+            # sub_total = CartItems.sub_total(),
         )
         cart_item.save()
     return redirect('cart')
 
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def remove_cart(request, id):
     cart = Cart.objects.get(cart_id=request.user.username)
     product = get_object_or_404(Products,id = id)
-    cart_item = CartItem.objects.get(product=product, cart=cart)
+    cart_item = CartItems.objects.get(product=product, cart=cart)
     if cart_item.quantity > 1:
         cart_item.quantity -= 1
         cart_item.save()
@@ -55,25 +60,28 @@ def remove_cart(request, id):
         cart_item.delete()
     return redirect('cart')
 
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def remove_cart_item(request, id):
     cart = Cart.objects.get(cart_id = request.user.username)
     product = get_object_or_404(Products,id = id)
-    cart_item = CartItem.objects.get(product=product, cart=cart)
+    cart_item = CartItems.objects.get(product=product, cart=cart)
     cart_item.delete()
     return redirect('cart')
 
-def cart(request,total=0,tax=0,grand_total=0,quantity=0,cart_items=None):
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
+def cart(request,total=0,tax=0,grand_total=0, quantity=0,cart_items=None):
     try:
         cart = Cart.objects.get(cart_id=request.user.username)
-        cart_items = CartItem.objects.filter(cart=cart, is_active=True)
-
+        cart_items = CartItems.objects.filter(cart=cart, is_active=True)
+        # products = get_object_or_404(Products,id = id)
+        # product=Products.objects.get(product=products)
         for cart_item in cart_items:
             total += (int(cart_item.product.product_discount_price) * int(cart_item.quantity))
             quantity += cart_item.quantity
             tax = (2 * total)/100
             grand_total = total + tax
+            # sub_total = product.product_discount_price * quantity
             user_id = request.user.id
-            OrderProduct.objects.create(quantity=quantity,grand_total=grand_total,tax=tax,user_id=user_id)
     except ObjectDoesNotExist:
         pass #just ignore
 
@@ -91,7 +99,7 @@ def checkout(request,total=0,tax=0,grand_total=0,quantity=0,cart_items=None):
     address = Address.objects.filter(user_id=request.user.id)
     try:
         cart = Cart.objects.get(cart_id=request.user.username)
-        cart_items = CartItem.objects.filter(cart=cart, is_active=True)
+        cart_items = CartItems.objects.filter(cart=cart, is_active=True)
         for cart_item in cart_items:
             total += (int(cart_item.product.product_discount_price) * int(cart_item.quantity))
             quantity += cart_item.quantity
@@ -116,7 +124,7 @@ def final(request):
     quantity=0
     try:
         cart = Cart.objects.get(cart_id=request.user.username)
-        cart_items = CartItem.objects.filter(cart=cart, is_active=True)
+        cart_items = CartItems.objects.filter(cart=cart, is_active=True)
 
         for cart_item in cart_items:
             total += (int(cart_item.product.product_discount_price) * int(cart_item.quantity))
@@ -157,49 +165,93 @@ def place_order(request):
     current_user = request.user
     if request.method == 'POST':
         address_data = Address.objects.get(user_id = current_user)
-        payment_method  = payment = request.POST['cash']
-         
+        payment_method = request.POST['cash']
         # creating order number using uuid
         order_id = str(uuid.uuid4())
-        user_id = current_user.id
-        status = "ordered"
+
+        order_status = "ordered"
+
+        user = request.user.id
+        ordered_user = Account.objects.get(id = user)
+
+        # taking the address
         
-        order = Order.objects.create(order_id = order_id, payment_mode = payment_method, user =  current_user, user_address = address_data,status=status )
-        cart_items = CartItem.objects.filter(user=current_user)
+        ordered_address = address_data.first_name + ", \n" + \
+            address_data.address_line_1 + "\n" + \
+            address_data.state + ", " + str(address_data.pincode) + "\n" + \
+            address_data.country + " ,\n" + \
+            address_data.phone_number 
+
+        print(ordered_address)
+
+        # order is instance of particular order
+        
+        order = Order.objects.create(order_id = order_id, payment_method = payment_method, user =  ordered_user, delivered_address = ordered_address, delivery_status = order_status )
+
+        print(order.order_id)
+
+        cart_items = CartItems.objects.filter(user = ordered_user)
+        total=0
+        quantity=0
+        for cart_item in cart_items:
+            total += (int(cart_item.product.product_discount_price) * int(cart_item.quantity))
+            quantity += cart_item.quantity
+            tax = (2 * total)/100
+            grand_total = total + tax
+            print(grand_total)
+
         for items in cart_items:
             single_order = order
-            print(single_order)
-            user = current_user
-            print(user)
-            product_id = items.products_id
+            user = ordered_user
+            product_id = items.product_id
+            product = Products.objects.get(id = product_id)
             print(product_id)
             quantity = items.quantity 
-            print(quantity)
             sub_total = items.sub_total
-            print(sub_total)
             is_active = items.is_active
-            print(is_active)
+            grand_total = grand_total
 
-            cart_orders = OrderItems.objects.create(order = single_order, user = user, products_id = product_id, quantity = quantity, sub_total = sub_total, is_active = is_active)
-            if payment_method == 'cash_on_delivery':
-                CartItems.objects.filter(user = current_user).delete()
+            cart_orders = OrderItems.objects.create(order = single_order, user = user, products_id = product, quantity = quantity,is_active = is_active,grand_total=grand_total)
 
-    return render(request,'final.html')
+            
+
+        if payment_method == 'cash on delivery':
+            CartItems.objects.filter(user = ordered_user).delete()
+
+            context = {
+                    'order_id': order_id,
+                    'order_address': ordered_address,
+                    'payment_method': payment_method,
+                    'order_status': order_status
+
+            }
 
 
-    cart_items = CartItem.objects.filter(user=current_user)
-    orderproduct = OrderProduct.objects.filter(user=current_user)
-    grand_total = orderproduct.grand_total
+            return render(request, 'final.html', context)
 
-    tax = orderproduct.tax
-    user_id = current_user.id
-    if request.method == 'POST':
-        
-    else:
-        pass
-    Orders.objects.create(payment_mode = payment,user_address = address_data,order_total=grand_total,tax=tax,user_id=user_id)
-    cart_items.delete()
-    return render(request,'final.html')
+        # else:
+        #     return redirect('home')
+
+# deleting cart item
+
+# @csrf_exempt
+# def delete_product(request):
+#     item_id = request.POST['item_id']
+#     CartItems.objects.get(id = item_id).delete()
+#     return JsonResponse('',safe=False)
+    # cart_items = CartItems.objects.filter(user=current_user)
+    # OrderItems = OrderItems.objects.filter(user=current_user)
+    # grand_total = OrderItems.grand_total
+
+    # tax = OrderItems.tax
+    # user_id = current_user.id
+    # if request.method == 'POST':
+    #     pass
+    # else:
+    #     pass
+    # Orders.objects.create(payment_mode = payment,address_data = address_data,order_total=grand_total,tax=tax,user_id=user_id)
+    # cart_items.delete()
+    # return render(request,'final.html')
 
 
 # def place_order(request):
@@ -209,7 +261,7 @@ def place_order(request):
 #     address_id = request.POST.get('address')
 #     payment = request.POST.get('payment_method')
 #     date = datetime.datetime.now()
-#     cart_items = CartItem.objects.filter(user=current_user)
+#     cart_items = CartItems.objects.filter(user=current_user)
 #     cart_count = cart_items.count()
 #     sub_total = 0
 
@@ -221,7 +273,7 @@ def place_order(request):
 #                 product.unit-=quantity
 #                 sub_total += total
 
-#     order = Orders.objects.create(user=current_user,user_address=address_data,payment=payment,status="ordered")
+#     order = Orders.objects.create(user=current_user,address_data=address_data,payment=payment,status="ordered")
 #     cart_items.delete()
 
 #     if cart_count <= 0:
@@ -249,16 +301,16 @@ def place_order(request):
 #     order.save()
 
 #     #move the cart items to order product table
-#     cart_items = CartItem.objects.filter(user=request.user)
+#     cart_items = CartItems.objects.filter(user=request.user)
 
 #     for item in cart_items:
-#         orderproduct = OrderProduct()
-#         orderproduct.order_id = order.id
-#         orderproduct.payment = payment
-#         orderproduct.user_id = request.user.id
-#         orderproduct.product_id = item.product_id
-#         orderproduct.quantity = item.quantity
-#         orderproduct.quantity = item.quantity
-#         orderproduct.product_price = item.product.price
-#         orderproduct.ordered = True
-#         orderproduct.save()
+#         OrderItems = OrderItems()
+#         OrderItems.order_id = order.id
+#         OrderItems.payment = payment
+#         OrderItems.user_id = request.user.id
+#         OrderItems.product_id = item.product_id
+#         OrderItems.quantity = item.quantity
+#         OrderItems.quantity = item.quantity
+#         OrderItems.product_price = item.product.price
+#         OrderItems.ordered = True
+#         OrderItems.save()

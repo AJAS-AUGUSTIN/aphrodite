@@ -4,6 +4,7 @@ from . import views
 from django.urls.resolvers import URLPattern
 
 urlpatterns = [
-    path('',views.orders,name='orders')
-    # path('place_order',views.place_order,name='place_order'),
+    path('',views.orders,name='orders'),
+    path('editordersadmin/<int:id>',views.editordersadmin,name='editordersadmin'),
+    path('statuschange/<int:id>',views.statuschange,name='statuschange'),
 ]

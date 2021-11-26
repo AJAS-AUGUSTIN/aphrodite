@@ -6,14 +6,14 @@
 <!-- ============================ COMPONENT 1 ================================= -->
 <div class="row">
 	<aside class="col-lg-6">
-<a href="{% url 'address' %}" class="btn btn-dark" style="margin-left: 5%; margin-top: 5%;">Add Address</a>
+<a href="{% url 'add_address_checkout' %}" class="btn btn-dark" style="margin-left: 5%; margin-top: 5%;">Add Address</a>
 
 <form action="{% url 'place_order' %}" method="post">
 {% csrf_token %}
 <div style="outline: 2px dashed black; margin-left: 10px;margin-top: 10px;">
 	{% for add in address %}
 	<div class="form-check p-4">
-		<input class="form-check-input" type="radio" name="address" id="address" value="{{add.id}}">
+		<input class="form-check-input" type="radio" name="address" id="address" value="{{add.id}}" checked>
 		<label class="form-check-label" for="flexRadioDefault1">
 			<p>{{add.first_name}}  {{add.last_name}}</p>
 			<p>{{add.address_line_1}}</p>
@@ -30,7 +30,8 @@
 {% endfor %}
 </div>
 <div class="form-check p-5">
-	<input class="form-check-input" type="radio" name="cash" id="cash" value="cash on delivery">
+	<h2>Payment</h2>
+	<input class="form-check-input" type="radio" name="cash" id="cash" value="cash on delivery" checked>
 	<label class="form-check-label" for="flexRadioDefault1">
 	  Cash on Delivery
 	</label>
