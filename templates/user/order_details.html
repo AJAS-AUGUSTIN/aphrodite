@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+
+{% load static %}
+
+{% block content %}
+
+<h2 class="text-center">Your Order Is Successful</h2>
+<div class="container"> 
+    <table class="table">
+        <thead class="thead-dark">
+          <tr>
+            <th scope="col">Order ID</th>
+            <th scope="col">Address</th>
+            <th scope="col">Payment</th>
+            <th scope="col">Order status</th>
+            <th scope="col">Grand Total</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <th scope="row">{{order_id}}</th>
+            <td>{{order_address}}</td>
+            <td>{{payment_method}}</td>
+            <td>{{order_status}}</td>
+            <td>{{grand_total}}</td>
+          </tr>
+        </tbody>
+      </table>
+</div>
+<a href="{% url 'home' 	%}" class="btn btn-dark" style="margin-left: 45%;">Continue Shopping</a>
+
+{% endblock %}

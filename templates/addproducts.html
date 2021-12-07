@@ -1,4 +1,4 @@
-<!-- <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -8,9 +8,14 @@
   <link href="//maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
   <script src="//maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
   <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/jquery-validation@1.19.3/dist/jquery.validate.min.js"></script>
+  <script src="/path/to/jquery.js"></script><!-- jQuery is required -->
+<link  href="/path/to/cropper.css" rel="stylesheet">
+<script src="/path/to/cropper.js"></script>
 </head>
 <body>
-<body style="background:-webkit-linear-gradient(left, #08eea9, #b011c5)"> -->
+<body style="background:-webkit-linear-gradient(left, #08eea9, #b011c5)">
+
 
 
 <div class="wrapper fadeInDown" style="margin-top: 50px;">
@@ -23,23 +28,32 @@
     </div>
 
     <!-- Login Form -->
-    <form action="{% url 'addproduct' %}" enctype="multipart/form-data" method="POST">
+    <form id="form" action="{% url 'addproduct' %}" enctype="multipart/form-data" method="POST">
       {% csrf_token %}
-      <input type="text" id="product_name" class="fadeIn second" name="product_name" placeholder="Product Name">
-      <input type="text" id="url_slug" class="fadeIn second" name="url_slug" placeholder="Url slug">
+      <input type="text" id="product_name" class="fadeIn second" name="product_name" placeholder="Product Name" required>
       <input type="text" id="brand" class="fadeIn second" name="brand" placeholder="Brand">
+      <input type="text" id="stock" class="fadeIn second" name="stock" placeholder="Stock">
       <input type="text" id="product_max_price" class="fadeIn second" name="product_max_price" placeholder="Product Max Price">
       <input type="text" id="product_discount_price" class="fadeIn second" name="product_discount_price" placeholder="Product discount Price">
-      <input type="text" id="product_description" class="fadeIn second" name="product_description" placeholder="Product Description">
-      <div class="col-sm-6 mb-4">
+      <input type="text" id="product_description" class="fadeIn second" name="product_description" placeholder="Product Description" required>
+      <div>
+        <input id="image" type="file" >
+      </div>
+      <!-- <div class="col-sm-6 mb-4">
         <label class="form-label">Image1</label>
         <input class="form-control" type="file" id="image1" name="image1">
-        <!-- <textarea name="image1" id="image1" style="display: none;"></textarea>
-        <img src="" id="image1" style="height: auto;width: 100px;"> -->
-    </div>
+         <textarea name="image1" id="image1" style="display: none;"></textarea>
+        <img src="" id="image1" style="height: auto;width: 100px;"> 
+    </div>   -->
       <!-- <input type="text" id="username" class="fadeIn second" name="username" placeholder="Product Long Description"> -->
-      <label for="cars">Choose a SubCategory:</label>
+      <label for="cars">Choose a Category:</label>
 
+      <select name="Category" >
+        {% for category in categories %}
+        <option value="{{category.id}}">{{ category.title }}</option>
+        {% endfor %}
+      </select><br> 
+      <label for="cars">Choose a SubCategory:</label>
       <select name="SubCategory" >
         {% for subcategory in subcategories %}
         <option value="{{subcategory.id}}">{{ subcategory.title }}</option>
@@ -56,8 +70,91 @@
 </body>
 </html>
 
-<style>
+<script>
+  $("#form").validate({
+    rules:{
+      product_name:{
+          required:true,
+          minlength:3,
+      },
+      brand:{
+          required:true,
+          minlength:3,
+      },
+      stock:{
+          required:true,
+          digits:true,
+      },
+      product_max_price:{
+          required:true,
+          digits:true,
+      },
+      product_discount_price:{
+          required:true,
+          digits:true,
+      },
+      product_description:{
+          required:true,
+          minlength:3,
+      },
+      },
+      messages: {
+        product_name:{
+          required:"Product Name is required",
+          minlength:"Minimum 3 characters required",
+      },
+      brand:{
+          required:"Brand is required",
+          minlength:"Minimum 3 characters required",
+      },
+      stock:{
+          required:"Stock is required",
+          digits:"Numberss required",
+      },
+      product_max_price:{
+          required:"Product price is required",
+          digits:"Number is required",
+      },
+      product_discount_price:{
+          required:"Product discount price is required",
+          digits:"Number is required",
+      },
+      product_description:{
+          required:"Product description is required",
+          minlength:"Minimum 3 characters required",
+      },
+      },
+  });
 
+// crop image
+var $image = $('#image');
+
+$image.cropper({
+  aspectRatio: 16 / 9,
+  crop: function(event) {
+    console.log(event.detail.x);
+    console.log(event.detail.y);
+    console.log(event.detail.width);
+    console.log(event.detail.height);
+    console.log(event.detail.rotate);
+    console.log(event.detail.scaleX);
+    console.log(event.detail.scaleY);
+  }
+});
+
+// Get the Cropper.js instance after initialized
+var cropper = $image.data('cropper');
+
+
+  </script>
+
+<style>
+  img {
+  max-width: 100%; /* This rule is very important, please do not ignore this! */
+}
+.error {
+      color: red;
+   }
 /* BASIC */
 
 /* html {
@@ -321,4 +418,4 @@ input[type=text]:placeholder {
 }
 
 </style>
-
+<script src="https://cdn.jsdelivr.net/npm/jquery-validation@1.19.3/dist/jquery.validate.min.js"></script>

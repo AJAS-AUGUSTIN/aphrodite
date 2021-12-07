@@ -40,7 +40,7 @@
                     return false;
                 }
                 if ( username.length < 3 ) {
-                    mess = "Enter username greater than 5";
+                    mess = "Enter username greater than 3";
                     error_message.innerHTML = mess;
                     return false;
                 }
@@ -73,6 +73,8 @@
     <link href="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
 <script src="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js"></script>
 <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jquery-validation@1.19.3/dist/jquery.validate.min.js"></script>
+
 
 <div class="container register-form" style="padding-top: 20px;">
     <form id="form" action="{% url 'register' %}" method="POST" onsubmit="return validate()">
@@ -88,7 +90,7 @@
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-group">
-                                <input type="text" id="first_name" name="first_name" placeholder="First Name" class="form-control">
+                                <input minlength="2" type="text" id="first_name" name="first_name" placeholder="First Name" class="form-control" required>
                             </div>
                             <div class="form-group">
                                 <input type="text" id="username" name="username" placeholder="User Name" class="form-control">
@@ -105,7 +107,7 @@
                                 <input type="text" id="last_name" name="last_name" placeholder="Last Name" class="form-control">
                             </div>
                             <div class="form-group">
-                                <input type="text" id="email" name="email" placeholder="E-mail" class="form-control">
+                                <input type="email" id="email" name="email" placeholder="E-mail" class="form-control">
                             </div>
                             <div class="form-group">
                                 <input type="password" id="password2" name="password2" placeholder="confirm password" class="form-control">
@@ -124,6 +126,74 @@
     </form>
     
 </body>
+<script>
+    $("#form").validate({
+        rules:{
+            first_name:{
+            required:true,
+            minlength:3,
+        },
+        last_name:{
+            required:true,
+        },
+        username: {
+            required:true,
+            minlength:3,
+        },
+        email: {
+            required:true,
+        },
+        password1: {
+            required:true,
+            minlength:2,
+        },
+        password2: {
+            required:true,
+            equalTo:"#password1"
+        },
+        phone_number: {
+            required:true,
+            digits:10,
+            minlength:10,
+            maxlength:10,
+        },
+
+        },
+        messages: {
+            first_name:{
+            required:"name needed",
+            minlength:"minimum 3 characters needed",
+        },
+        last_name:{
+            required:"this field required",
+        },
+        username: {
+            required:"Username is required",
+            minlength:"Username should be atleast 3 characters"
+        },
+        email: {
+            required:"Email is required",
+        },
+        password1: {
+            required:"Password is required",
+            minlength:"Password should have atleast 2 characters",
+        },
+        password2: {
+            required:"Confirm password",
+            equalTo:"Passwords does'nt match"
+        },
+        phone_number: {
+            required:"Phone Number is required",
+            digits:"Enter digits",
+            minlength:"Enter 10 digit Phone Number",
+            maxlength:"Enter 10 digit Phone Number",
+        },
+
+        },
+
+    });
+    </script>
+    
 
 <style>
     .note
@@ -162,38 +232,12 @@
     background: #0062cc;
     color: #fff;
 }
+.error {
+      color: red;
+   }
 </style>
 
 
 
 </html>
 {% endblock %}
-
-
-<!-- <!DOCTYPE html>8000
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Registration</title>
-</head>
-<body>
-    <form action="" method="POST">
-        {% csrf_token %}
-        <input type="text" name="first_name" placeholder="First Name"><br>
-        <input type="text" name="last_name" placeholder="Last Name"><br>
-        <input type="text" name="username" placeholder="User Name"><br>
-        <input type="text" name="email" placeholder="E-mail"><br>
-        <input type="text" name="password1" placeholder="Password"><br>
-        <input type="text" name="password2" placeholder="confirm password"><br>
-        <button type="submit">submit</button>
-    </form>
-
-    <div>
-    {% for message in messages %}
-      <h3>{{ message }}</h3>
-      {% endfor %}
-    </div>
-</body>
-</html> -->

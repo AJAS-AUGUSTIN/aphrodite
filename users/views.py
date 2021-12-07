@@ -13,7 +13,7 @@ from carts.models import Cart, CartItems
 from category.models import Address, Products
 from django.http import JsonResponse
 import json
-from carts.views import _cart_id
+# from carts.views import _cart_id
 import requests
 from orders.models import Order, OrderItems
 from orders.views import orders
@@ -152,7 +152,7 @@ def login_with_otp(request):
             if Account.objects.filter(phone_number=phone_number).exists():
                 phone_number = '+91'+str(phone_number)
                 account_sid = 'AC8d1ed90c743abe70963aa42514c5587d'
-                auth_token = '8598d7e084fb986c574238d3fd992334'
+                auth_token = 'a8b1081205e9991a3a07bd8f22f933f6'
                 client = Client(account_sid, auth_token)
 
                 verification = client.verify \
@@ -162,7 +162,7 @@ def login_with_otp(request):
                 print('entry')
                 return render(request, 'otpentry.html', {'phone_number': phone_number})
             else:
-                messages.info(request, 'The phone number does not exist',
+                messages.info(request, "The phone number does not exist",
                               extra_tags="phone_number_otp_error")
                 print('phone number error')
                 return render(request, 'otp.html')
@@ -216,6 +216,14 @@ def userdetails(request):
     else:
         return redirect('login')
 
+def cancel_order_user(request, id):
+    user = Account.objects.get(id = request.user.id)
+    print(user)
+    order = Order.objects.get(id = id)
+    print(order)
+    order.delivery_status = 'cancelled'
+    order.save()
+    return redirect('userdetails')
 
 def editaddress(request,id):
     address = Address.objects.get(id=id)
@@ -236,6 +244,26 @@ def editaddress(request,id):
 
     else:
         return render(request,'addresschange.html', {'address' : address})
+
+def editaddress_checkout(request,id):
+    address = Address.objects.get(id=id)
+    if request.method == 'POST':
+        address.first_name = request.POST['first_name']
+        address.last_name = request.POST['last_name']
+        address.email = request.POST['email']
+        address.phone_number = request.POST['phone_number']
+        address.address_line_1 = request.POST['address_line_1']
+        address.address_line_2 = request.POST['address_line_2']
+        address.city = request.POST['city']
+        address.state = request.POST['state']
+        address.country = request.POST['country']
+        address.pincode = request.POST['pincode']
+        address.order_note = request.POST['order_note']
+        address.save()
+        return redirect('checkout')
+
+    else:
+        return render(request,'editaddress_checkout.html', {'address' : address})
 
 def listaddress(request):
     address = Address.objects.filter(user_id=request.user.id)

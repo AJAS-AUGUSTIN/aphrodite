@@ -12,29 +12,45 @@
 {% csrf_token %}
 <div style="outline: 2px dashed black; margin-left: 10px;margin-top: 10px;">
 	{% for add in address %}
-	<div class="form-check p-4">
-		<input class="form-check-input" type="radio" name="address" id="address" value="{{add.id}}" checked>
-		<label class="form-check-label" for="flexRadioDefault1">
+	<div class="container">
+	<div class="ex1">
+
+		<!-- <select class="form-select" aria-label="Default select example">
+			<option selected>Select Address</option>
+			<option value="1">One</option>
+			<option value="2">Two</option>
+			<option value="3">Three</option>
+		  </select> -->
+
+		<input class="form-check-input" type="radio" name="address" id="address" style="margin-left: 10px;" value="{{add.id}}">
+		<label class="form-check-label" for="flexRadioDefault1" style="margin-left: 50px;">
+			<a href="{% url 'editaddress_checkout' id=add.id %}" class="btn btn-primary " style="margin-left: 750px;" >Edit</a>
 			<p>{{add.first_name}}  {{add.last_name}}</p>
 			<p>{{add.address_line_1}}</p>
 			<p>{{add.address_line_2}}</p>
 			<p>{{add.phone}}</p>
-			<p>{{add.email}}</p>
+			<!-- <p>{{add.email}}</p> -->
 			<p>{{add.phone_number}}</p>
 			<p>{{add.city}}</p>
-			<p>{{add.state}}</p>
-			<p>{{add.country}}</p>
+			<!-- <p>{{add.state}}</p>
+			<p>{{add.country}}</p> -->
 			<p>{{add.pincode}}</p>
 		</label>
 	  </div>
+	</div>  
 {% endfor %}
 </div>
 <div class="form-check p-5">
 	<h2>Payment</h2>
-	<input class="form-check-input" type="radio" name="cash" id="cash" value="cash on delivery" checked>
-	<label class="form-check-label" for="flexRadioDefault1">
+	<input style="margin-left: 10px;" class="form-check-input" type="checkbox" name="cash" id="cash" value="cash on delivery" >
+	<button class="btn btn-primary" name="cash" value="cash on delivery" style="width: 88%;margin-bottom: 3%;"><label style="margin-left: 30px;" class="form-check-label" for="flexRadioDefault1">
 	  Cash on Delivery
-	</label>
+	</label></button>
+	<div id="paypal-button-container"></div>
+
+    <!-- Include the PayPal JavaScript SDK -->
+    <script src="https://www.paypal.com/sdk/js?client-id=test&currency=USD"></script>
+
 </div>
 
 
@@ -85,10 +101,7 @@
 		</div> <!-- card-body.// -->
 		</div> <!-- card.// -->
 
-		
-
 </aside> <!-- col.// -->
-
 
 </div> <!-- row.// -->
 
@@ -96,7 +109,144 @@
 
 </div> <!-- container .//  -->
 </section>
+
+
 <!-- ========================= SECTION CONTENT END// ========================= -->
+
+
+<!-- paypal script -->
+
+<script>
+
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            // Does this cookie string begin with the name we want?
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+
+/* creating uuid  */
+
+function uuidv4() {
+  return ([1e7]+-1e3+-4e3+-8e3+-1e11).replace(/[018]/g, c =>
+    (c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> c / 4).toString(16)
+  );
+}
+
+	var amount = '{{ grand_total }}'
+	var url = "{% url 'paypal_payment' %}"
+	var csrftoken = getCookie('csrftoken');
+	var orderID = uuidv4()	
+	var payment_methods = "PayPal"
+	var address_id = document.querySelector('[name="address"]').value;
+	var redirecting_url = "{% url 'paypal_payment_success' %}"
+	var error_redirecting_url = "{% url 'payment_error' %}"
+	
+	// Render the PayPal button into #paypal-button-container
+	paypal.Buttons({
+
+		// Set up the transaction
+		createOrder: function(data, actions) {
+			return actions.order.create({
+				purchase_units: [{
+					amount: {
+						value: amount,
+					}
+				}]
+			});
+		},
+
+		// Finalize the transaction
+		onApprove: function(data, actions) {
+			return actions.order.capture().then(function(orderData) {
+				// Successful capture! For demo purposes:
+				console.log('Capture result', orderData, JSON.stringify(orderData, null, 2));
+				var transaction = orderData.purchase_units[0].payments.captures[0];
+				// alert('Transaction '+ transaction.status + ': ' + transaction.id + '\n\nSee console for all available details');
+				sendData();
+				function sendData(){
+					fetch(url, {
+						method:"POST",
+						headers: {
+							"Content-type":"application/json",
+							"X-CSRFToken":csrftoken,
+						},
+						body: JSON.stringify({
+							orderID: orderID,
+							transID: orderData.id,
+							payment_methods : payment_methods,
+							status : orderData.status,
+							address_id : address_id,
+                    		grand_total :  amount,
+						}),
+					})
+					// .then(response => response.json())
+					// .then(data => console.log(data));
+					.then(response => response.json())
+                	.then(data => {
+                  	console.log(data);
+                  	console.log("success")
+                  	window.location.href = redirecting_url + '?order_id='+data.new_order_id+'&trans_id='+data.transID;
+
+                })
+                .catch((error) => {
+                  window.location.href = error_redirecting_url;
+                });
+				}
+				// Replace the above to show a success message within this page, e.g.
+				// const element = document.getElementById('paypal-button-container');
+				// element.innerHTML = '';
+				// element.innerHTML = '<h3>Thank you for your payment!</h3>';
+				// Or go to another URL:  actions.redirect('thank_you.html');
+			});
+		}
+
+
+	}).render('#paypal-button-container');
+
+</script>
+
+<form style="margin-left: 360px;" action="{% url 'razorpay_payment' %}" method="POST">
+	{% csrf_token %}
+<script
+    src="https://checkout.razorpay.com/v1/checkout.js"
+    data-key="rzp_test_EBo2ZDIjBvXvjr" // Enter the Test API Key ID generated from Dashboard → Settings → API Keys
+    data-amount="5000" // Amount is in currency subunits. Hence, 29935 refers to 29935 paise or ₹299.35.
+	console.log(data-amount)
+    data-currency="INR"// You can accept international payments by changing the currency code. Contact our Support Team to enable International for your account
+    data-order_id="orderID"// Replace with the order_id generated by you in the backend.
+    data-buttontext="Pay with Razorpay"
+    data-name="WatchKart"
+    data-description="Your favourite destination for watches"
+    data-image="https://example.com/your_logo.jpg"
+    data-prefill.name="WK"
+    data-prefill.email="watchkart@watchkart.com"
+    data-theme.color="#F37254"
+></script>
+<input type="hidden" custom="Hidden Element" name="hidden">
+</form>
+
+
+
+
+
+ <style>
+	 div.ex1 {
+  background-color: lightblue;
+  width: 910px;
+  height: 150px;
+  overflow: scroll;
+}
+ </style>
 </body>
 </html>
 

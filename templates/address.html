@@ -3,11 +3,12 @@
 {% load static %}
 
 {% block content %}
+<script src="https://cdn.jsdelivr.net/npm/jquery-validation@1.19.3/dist/jquery.validate.min.js"></script>
 
 <div class="card">
 	<div class="card-body">
 		<h4 class="card-title mb-4">Billing Address</h4>
-		<form action="{% url 'add_address' %}" method="post">
+		<form id="form" action="{% url 'add_address' %}" method="post">
 			{% csrf_token %}
 			<div class="form-row">
 				<div class="col form-group" style="break-after: always;">
@@ -60,5 +61,93 @@
 	</div>
 </div> <!-- card.// -->
 <button type="submit" name="submit" class="btn btn-primary btn-block">Save Address</button>
+
+
+<script>
+    $("#form").validate({
+        rules:{
+            first_name:{
+            required:true,
+            minlength:3,
+        },
+        last_name:{
+            required:true,
+        },
+        email: {
+            required:true,
+        },
+        phone_number: {
+            required:true,
+            digits:10,
+            minlength:10,
+            maxlength:10,
+        },
+		address_line_1: {
+			required:true,
+			minlength:3,
+		},
+		city: {
+			required: true,
+		},
+		state: {
+			required:true,
+		},
+		country: {
+			required:true,
+		},
+		pincode: {
+			required: true,
+			digits:6,
+			minlength:6,
+			maxlength:6,
+		},
+
+        },
+        messages: {
+            first_name:{
+            required:"name needed",
+            minlength:"minimum 3 characters needed",
+        },
+        last_name:{
+            required:"this field required",
+        },
+        email: {
+            required:"Email is required",
+        },
+        phone_number: {
+            required:"Phone Number is required",
+            digits:"Enter digits",
+            minlength:"Enter 10 digit Phone Number",
+            maxlength:"Enter 10 digit Phone Number",
+        },
+		address_line_1: {
+			required:"Address is required",
+			minlength:"Enter valid address",
+		},
+		city: {
+			required: "city is required",
+		},
+		state: {
+			required:"state is required",
+		},
+		country: {
+			required:"country is required",
+		},
+		pincode: {
+			required: "Pincode is required",
+			digits:"Enter valid pincode",
+			minlength:"Enter valid pincode ",
+			maxlength:"enter valid pincode",
+		},
+
+        },
+
+    });
+    </script>
+	<style>
+		.error {
+      color: red;
+   }
+	</style>
 
 {% endblock %}

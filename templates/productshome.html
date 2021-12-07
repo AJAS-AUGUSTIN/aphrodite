@@ -314,7 +314,7 @@ $(document).ready(function(){
 								</span> -->
 							</th>
 							<th>Product Name</th>
-							<th>url-slug</th>
+							<!-- <th>slug</th> -->
 							<th>Brand</th>
 							<th>Product Max Price</th>
                             <th>Product Discount Price</th>
@@ -322,6 +322,7 @@ $(document).ready(function(){
                             <th>Created at</th>
                             <th>Total Stock</th>
                             <th>Status</th>
+							<th>Image</th>
 
 						</tr>
 					</thead>
@@ -335,7 +336,7 @@ $(document).ready(function(){
 								</span> -->
 							</td>
 							<td>{{product.product_name}}</td>
-							<td>{{product.url_slug}}</td>
+							<!-- <td>{{product.slug}}</td> -->
                             <td>{{product.brand}}</td>
                             <td>{{product.product_max_price}}</td>
                             <td>{{product.product_discount_price}}</td>
@@ -343,6 +344,7 @@ $(document).ready(function(){
 							<td>{{product.created_at}}</td>
                             <td>{{product.in_stock_total}}</td>
                             <td>{{product.is_active}}</td>
+							<td>{{product.image1}}</td>
 							<td>
 								<a href="{% url 'editproduct' product.id %}" class="edit" data-toggle="modal"><i class="material-icons" data-toggle="tooltip" title="Edit">&#xE254;</i></a>
 								<a href="{% url 'delproduct' product.id %}" class="delete" data-toggle="modal"><i class="material-icons" data-toggle="tooltip" title="Delete">&#xE872;</i></a>

@@ -1,0 +1,153 @@
+{% extends 'base.html' %}
+
+{% load static %}
+
+{% block content %}
+
+<script src="https://cdn.jsdelivr.net/npm/jquery-validation@1.19.3/dist/jquery.validate.min.js"></script>
+
+<div class="card">
+	<div class="card-body">
+		<h4 class="card-title mb-4">Billing Address</h4>
+		<form id="form" action="{% url 'editaddress_checkout' address.id %}" method="POST">
+			{% csrf_token %}
+			<div class="form-row">
+				<div class="col form-group" style="break-after: always;">
+					<label for="">First Name</label>
+					<input type="text" name="first_name" class="form-control" required value="{{address.first_name}}">
+				</div>
+				<div class="col form-group" style="break-after: always;">
+					<label for="">Last Name</label>
+					<input type="text" name="last_name" class="form-control" required value="{{address.last_name}}"> 
+				</div>
+				<div class="col form-group" style="break-after: always;">
+					<label for="">Email</label>
+					<input type="email" name="email" class="form-control" required value="{{address.email}}">
+				</div>
+				<div class="col form-group" style="break-after: always;">
+					<label for="">Phone Number</label>
+					<input type="tel" name="phone_number" class="form-control" required value="{{address.phone_number}}">
+				</div>
+				<div class="col form-group" style="break-after: always;">
+					<label for="">Address Line 1</label>
+					<input type="text" name="address_line_1" class="form-control" required value="{{address.address_line_1}}">
+				</div>
+				<div class="col form-group" style="break-after: always;">
+					<label for="">Address Line 2</label>
+					<input type="text" name="address_line_2" class="form-control" value="{{address.address_line_2}}">
+				</div>
+				<div class="col form-group">
+					<label for="">City</label>
+					<input type="text" name="city" class="form-control" required value="{{address.city}}">
+				</div>
+				<div class="col form-group">
+					<label for="">State</label>
+					<input type="text" name="state" class="form-control" required value="{{address.state}}">
+				</div>
+				<div class="col form-group" style="break-after: always;">
+					<label for="">Country</label>
+					<input type="text" name="country" class="form-control" required value="{{address.country}}">
+				</div>
+				<div class="col form-group" style="break-after: always;">
+					<label for="">Pincode</label>
+					<input type="text" name="pincode" class="form-control" required value="{{address.pincode}}">
+				</div>
+			</div>
+				<div class="form-row">
+					<label for="">Order Note</label>
+					<textarea name="order_note" rows="2"></textarea>
+				</div>
+	</div>
+</div> <!-- card.// -->
+
+<button type="submit" name="submit" class="btn btn-primary btn-block">Save Address</button>
+</form>
+
+<script>
+    $("#form").validate({
+        rules:{
+            first_name:{
+            required:true,
+            minlength:3,
+        },
+        last_name:{
+            required:true,
+        },
+        email: {
+            required:true,
+        },
+        phone_number: {
+            required:true,
+            digits:10,
+            minlength:10,
+            maxlength:10,
+        },
+		address_line_1: {
+			required:true,
+			minlength:3,
+		},
+		city: {
+			required: true,
+		},
+		state: {
+			required:true,
+		},
+		country: {
+			required:true,
+		},
+		pincode: {
+			required: true,
+			digits:6,
+			minlength:6,
+			maxlength:6,
+		},
+
+        },
+        messages: {
+            first_name:{
+            required:"name needed",
+            minlength:"minimum 3 characters needed",
+        },
+        last_name:{
+            required:"this field required",
+        },
+        email: {
+            required:"Email is required",
+        },
+        phone_number: {
+            required:"Phone Number is required",
+            digits:"Enter digits",
+            minlength:"Enter 10 digit Phone Number",
+            maxlength:"Enter 10 digit Phone Number",
+        },
+		address_line_1: {
+			required:"Address is required",
+			minlength:"Enter valid address",
+		},
+		city: {
+			required: "city is required",
+		},
+		state: {
+			required:"state is required",
+		},
+		country: {
+			required:"country is required",
+		},
+		pincode: {
+			required: "Pincode is required",
+			digits:"Enter valid pincode",
+			minlength:"Enter valid pincode ",
+			maxlength:"enter valid pincode",
+		},
+
+        },
+
+    });
+    </script>
+	<style>
+		.error {
+      color: red;
+   }
+	</style>
+
+{% endblock %}

@@ -8,6 +8,7 @@
   <link href="//maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
   <script src="//maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
   <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/jquery-validation@1.19.3/dist/jquery.validate.min.js"></script>
 </head>
 <body>
 <!-- <body style="background:-webkit-linear-gradient(left, #08eea9, #b011c5)"> -->
@@ -25,10 +26,13 @@
     <!-- Login Form -->
     <form action="{% url 'editcategory' category.title %}" method="POST">
       {% csrf_token %}
-      <input type="text" id="title" class="fadeIn second" name="title" placeholder="{{category.title}}">
-      <input type="text" id="url_slug" class="fadeIn second" name="url_slug" placeholder="{{category.url_slug}}">
-      <input type="text" id="thumbnail" class="fadeIn second" name="thumbnail" placeholder="{{category.thumbnail}}">
-      <input type="text" id="description" class="fadeIn second" name="description" placeholder="{{category.description}}">
+      <input type="text" id="title" class="fadeIn second" name="title" value="{{category.title}}">
+      <input type="text" id="slug" class="fadeIn second" name="slug" value="{{category.slug}}">
+      <input type="text" id="description" class="fadeIn second" name="description" value="{{category.description}}">
+      <!-- <div class="col-sm-6 mb-4">
+        <label class="form-label">Image</label>
+        <input class="form-control" type="file" id="cat_image" name="cat_image" value="{{category.cat_image}}">
+      </div> -->
       <input type="submit" class="fadeIn fourth" value="ADD"><br>
     </form>
     <div>
@@ -40,8 +44,38 @@
 </body>
 </html>
 
-<style>
+<script>
+  $("#form").validate({
+      rules:{
+        title:{
+          required:true,
+          minlength:3,
+      },
+      description:{
+          required:true,
+          minlength:3,
+      },
+      },
+      messages: {
+        title:{
+          required:"name needed",
+          minlength:"minimum 3 characters needed",
+      },
+      description:{
+          required:"Description is required",
+          minlength:"Minimum 3 characters required"
 
+      },
+
+      },
+
+  });
+  </script>
+
+<style>
+ .error {
+      color: red;
+   }
 /* BASIC */
 
 /* html {

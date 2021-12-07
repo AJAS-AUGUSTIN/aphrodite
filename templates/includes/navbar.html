@@ -2,7 +2,7 @@
  <!-- navbar starts -->
 {% load static %}
 
-<header class="section-header">
+<header class="section-header" id="cart_list_nav">
     <nav class="navbar p-md-0 navbar-expand-sm navbar-light border-bottom">
     <div class="container">
       <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarTop4" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
@@ -36,18 +36,19 @@
         </div>
         <div class="col-lg col-sm col-md col-6 flex-grow-0">
             <div class="category-wrap dropdown d-inline-block float-right">
-                <!-- <button type="button" class="btn btn-dark dropdown-toggle" data-toggle="dropdown"> 
+                <button type="button" class="btn btn-dark dropdown-toggle" data-toggle="dropdown"> 
                     <i class="fa fa-bars"></i> All category 
-                </button> -->
+                </button>
                 <div class="dropdown-menu">
-                    {% for category in categories %}
-                    <a class="dropdown-item" href="#">{{ category.title }}</a>
+                    <a class="dropdown-item" href="{% url 'store' %}">All</a>
+                    {% for category in links %}
+                    <a class="dropdown-item" href="{{category.get_url}}">{{ category.title }}</a>
                     {% endfor %}
                 </div>
             </div>  <!-- category-wrap.// -->
         </div> 
         <!-- col.// -->
-        <a href="{% url 'home' %}" class="btn btn-outline-dark">Store</a>
+        <a href="{% url 'store' %}" class="btn btn-outline-dark">Store</a>
         <div class="col-lg  col-md-6 col-sm-12 col">
             <form action="#" class="search">
                 <div class="input-group w-100">

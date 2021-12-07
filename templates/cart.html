@@ -4,7 +4,6 @@
 
 {% block content %}
 <!-- ============================ COMPONENT 1 ================================= -->
-
 {% if not cart_items %}
 <h2 class="text-center">Your Shopping Cart is Empty</h2>
 <br>
@@ -12,7 +11,7 @@
 <a href="{% url 'home' 	%}" class="btn btn-dark">Continue Shopping</a>
 </div>
 {% else %}
-<div class="row">
+<div class="row" id="cart_list" style="width: 100%;">
 	<aside class="col-lg-9">
 <div class="card">
 <table class="table table-borderless table-shopping-cart">
@@ -57,7 +56,7 @@
 		</div> <!-- price-wrap .// -->
 	</td>
 	<td class="text-right"> 
-	<a href="{% url 'remove_cart_item' cart_item.product.id %}" class="btn btn-danger"> Remove</a> 
+	<a class="btn btn-danger" onclick="confirm_delete('{{cart_item.product.id}}')"> Remove</a>
 	</td>
 </tr>
 {% endfor %}
@@ -102,6 +101,51 @@
 </section>
 <!-- ========================= SECTION CONTENT END// ========================= -->
 </body>
+<script type="text/javascript">
+	function confirm_delete(cart_item){
+		var data = {
+			'cart_item':cart_item,
+			'csrf_token':'{{csrf_token}}',
+		}
+
+		swal({
+  title: "Are you sure?",
+  text: "Once deleted you will not be able to recover cart item",
+  icon: "warning",
+  buttons: true,
+  dangerMode: true,
+})
+.then((willDelete) => {
+  if (willDelete) {
+
+	$.ajax({
+		url:"{% url 'remove_cart_item' %}",
+		type:"POST",
+		data:data,
+		dataType:"html",
+		success:function(){
+			$("#cart_list").load(location.href+"#cart_list");
+			setInterval('refreshPage()', 1000);
+
+		}
+	});
+	
+	$("#cart_list_nav").load(location.href+"#cart_list_nav");
+
+    swal("Your cart item has been removed", {
+      icon: "success",
+    });
+  } else {
+    swal("Your cart item is safe!");
+  }
+});
+}
+
+function refreshPage() { 
+        location.reload(); 
+    }
+
+</script>
 </html>
 
 {% endblock %}

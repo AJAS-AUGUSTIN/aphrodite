@@ -32,7 +32,7 @@
 		</header>
 		<div class="card-body">
 			<div class="row"> 
-				<div class="col-md-8">
+				<div class="col-md-6">
 					<h6 class="text-muted">Delivery to</h6>
 					<p> 
 					{{order.delivered_address}}
@@ -47,7 +47,16 @@
 					<!-- <p>Subtotal: $356 <br>
 					 Shipping fee:  $56 <br> 
 					 <span class="b">Total:  $456 </span> -->
-					</p>
+					<!-- </p> -->
+				</div>
+				{% if order.delivery_status != 'cancelled' %}
+
+				<a href="{% url 'cancel_order_user' order.id %}" class="btn btn-primary" style="height: fit-content; margin: 15px;">Cancel</a>
+
+				{% endif %}
+				<div class="col-md-4" style="margin-top: 10px;">
+					<h6 class="text-muted">Delivery Status</h6>
+					    {{order.delivery_status}}  
 				</div>
 			</div> <!-- row.// -->
 		</div> <!-- card-body .// -->

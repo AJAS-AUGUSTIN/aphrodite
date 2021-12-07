@@ -3,16 +3,19 @@ from django.db.models.query_utils import Q
 from django.http.response import HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.views.decorators.cache import never_cache , cache_control
+from django.views.decorators.csrf import csrf_exempt
 from accounts.models import Account
 from category.models import Address
 from category.models import Products
+from django.http import JsonResponse
 # from category.views import address
-from orders.models import OrderItems,Order
+from orders.models import OrderItems,Order, Payment
 from .models import Cart, CartItems
 from django.contrib.auth.decorators import login_required
 import json
 import datetime
 import uuid
+import razorpay
 
 # Create your views here.
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
@@ -61,7 +64,9 @@ def remove_cart(request, id):
     return redirect('cart')
 
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
-def remove_cart_item(request, id):
+@csrf_exempt
+def remove_cart_item(request):
+    id = request.POST.get('cart_item')
     cart = Cart.objects.get(cart_id = request.user.username)
     product = get_object_or_404(Products,id = id)
     cart_item = CartItems.objects.get(product=product, cart=cart)
@@ -184,7 +189,7 @@ def place_order(request):
 
         print(ordered_address)
 
-        # order is instance of particular order
+        # order is instance of particular order 
         
         order = Order.objects.create(order_id = order_id, payment_method = payment_method, user =  ordered_user, delivered_address = ordered_address, delivery_status = order_status )
 
@@ -229,12 +234,112 @@ def place_order(request):
 
             return render(request, 'final.html', context)
 
-        # else:
-        #     return redirect('home')
+
+
+# paypal payment
+
+@csrf_exempt
+def paypal_payment(request):
+    body = json.loads(request.body)
+
+    transaction_id = body['transID']
+
+    id = request.user.id
+
+    current_user = Account.objects.get(id = id)
+
+    address_id = body['address_id']
+    print('address id:',address_id)
+    current_user_address = Address.objects.get(id = address_id) 
+    print(current_user_address)
+
+    delivery_status = 'ordered'
+
+    ordered_address = current_user_address.first_name + ", \n" + \
+    current_user_address.address_line_1 + "\n" + \
+    current_user_address.state + ", " + str(current_user_address.pincode) + "\n" + \
+    current_user_address.country + " ,\n" + \
+    current_user_address.phone_number 
+
+    new_order = Order.objects.create(user = current_user,order_id  = body['orderID'], payment_method = body['payment_methods'], delivered_address = ordered_address, delivery_status = delivery_status, payment_status = body['status'], grand_total = body['grand_total'] )
+    print(new_order)
+    Payment.objects.create(user = current_user, payment_id = body['transID'], payment_method = body['payment_methods'], amount_paid = body['grand_total'], status = body['status'], order = new_order  )
+    #moving the cart products to order items 
+
+    cart_items = CartItems.objects.filter(user = current_user)
+    print(cart_items)
+    for item in cart_items:
+        print('hii')
+
+        sub=item.sub_total()
+        print(sub)
+        OrderItems.objects.create(quantity = item.quantity, products_id = item.product, sub_total = sub, user = current_user, order = new_order)
+
+        #reducing the product stock
+        print('hello')
+        product = Products.objects.get(id = item.product.id)
+        print(product)
+        # product.stocks -= item.quantity
+        product.save()
+
+    cart_items.delete()
+
+    # Taking new order id
+    new_order_id = new_order.id
+
+
+    data = {
+        'new_order_id' :new_order_id ,
+        'transID' : transaction_id,
+    }
+    print(new_order_id)
+    print(transaction_id)
+    return JsonResponse(data, safe=False)
+    
+# paypal success
+    
+@csrf_exempt
+@never_cache
+def paypal_payment_success(request):
+    order_id = request.GET.get('order_id')
+    trans_id = request.GET.get('trans_id')
+
+    current_order = Order.objects.get(id = order_id)
+    order_id= current_order.order_id,
+    order_address= current_order.delivered_address,
+    payment_method= current_order.payment_method,
+    order_status= current_order.delivery_status,
+    grand_total=current_order.grand_total
+
+    context = {
+        'order_id': order_id,
+        'order_address': order_address,
+        'payment_method': payment_method,
+        'order_status': order_status,
+        'grand_total':grand_total
+
+
+    }
+    return render(request, 'user/order_details.html', context)
+
+def payment_error(request):
+    return render(request, 'payment_error.html' )
+
+
+# razorpay payment
+
+def razorpay_payment(request):
+    if request.method == 'POST':
+            amount = 100,
+            currency = "INR",
+            client = razorpay.Client(auth=("rzp_test_EBo2ZDIjBvXvjr", "QnRCAOb0PBbntTMLIkK9y9Y6"))
+
+            payment=client.order.create({'amount':amount,'currency':'INR','payment_capture':'1'})
+    return
 
 # deleting cart item
 
-# @csrf_exempt
+# @csrf_exempt  
 # def delete_product(request):
 #     item_id = request.POST['item_id']
 #     CartItems.objects.get(id = item_id).delete()

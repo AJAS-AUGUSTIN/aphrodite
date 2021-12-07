@@ -32,6 +32,7 @@ urlpatterns = [
 
     #orders
     path('orders/',include('orders.urls')),
+    path('store/',include('store.urls')),
 ]
 
 urlpatterns += static(settings.MEDIA_URL, document_root = settings.MEDIA_ROOT)

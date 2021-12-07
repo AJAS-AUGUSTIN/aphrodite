@@ -1,4 +1,4 @@
-<!-- <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -8,9 +8,10 @@
   <link href="//maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
   <script src="//maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
   <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/jquery-validation@1.19.3/dist/jquery.validate.min.js"></script>
 </head>
 <body>
-<body style="background:-webkit-linear-gradient(left, #08eea9, #b011c5)"> -->
+<body style="background:-webkit-linear-gradient(left, #08eea9, #b011c5)">
 
 
     <div class="wrapper fadeInDown" style="margin-top: 50px;">
@@ -25,12 +26,11 @@
           <!-- Login Form -->
           <form action="{% url 'editproduct' product.id %}" method="POST">
             {% csrf_token %}
-            <input type="text" id="product_name" class="fadeIn second" name="product_name" placeholder="{{product.product_name}}">
-            <input type="text" id="url_slug" class="fadeIn second" name="url_slug" placeholder="{{product.url_slug}}">
-            <input type="text" id="brand" class="fadeIn second" name="brand" placeholder="{{product.brand}}">
-            <input type="text" id="product_max_price" class="fadeIn second" name="product_max_price" placeholder="{{product.product_max_price}}">
-            <input type="text" id="product_discount_price" class="fadeIn second" name="product_discount_price" placeholder="{{product.product_discount_price}}">
-            <input type="text" id="product_description" class="fadeIn second" name="product_description" placeholder="{{product.product_description}}">
+            <input type="text" id="product_name" class="fadeIn second" name="product_name" value="{{product.product_name}}">
+            <input type="text" id="brand" class="fadeIn second" name="brand" value="{{product.brand}}">
+            <input type="text" id="product_max_price" class="fadeIn second" name="product_max_price" value="{{product.product_max_price}}">
+            <input type="text" id="product_discount_price" class="fadeIn second" name="product_discount_price" value="{{product.product_discount_price}}">
+            <input type="text" id="product_description" class="fadeIn second" name="product_description" value="{{product.product_description}}">
             <!-- <input type="text" id="username" class="fadeIn second" name="username" placeholder="Product Long Description"> -->
             <label for="cars">Choose a SubCategory:</label>
       
@@ -49,9 +49,68 @@
       </div>
       </body>
       </html>
-      
+     
+      <script>
+        $("#form").validate({
+          rules:{
+            product_name:{
+                required:true,
+                minlength:3,
+            },
+            brand:{
+                required:true,
+                minlength:3,
+            },
+            stock:{
+                required:true,
+                digits:true,
+            },
+            product_max_price:{
+                required:true,
+                digits:true,
+            },
+            product_discount_price:{
+                required:true,
+                digits:true,
+            },
+            product_description:{
+                required:true,
+                minlength:3,
+            },
+            },
+            messages: {
+              product_name:{
+                required:"Product Name is required",
+                minlength:"Minimum 3 characters required",
+            },
+            brand:{
+                required:"Brand is required",
+                minlength:"Minimum 3 characters required",
+            },
+            stock:{
+                required:"Stock is required",
+                digits:"Numberss required",
+            },
+            product_max_price:{
+                required:"Product price is required",
+                digits:"Number is required",
+            },
+            product_discount_price:{
+                required:"Product discount price is required",
+                digits:"Number is required",
+            },
+            product_description:{
+                required:"Product description is required",
+                minlength:"Minimum 3 characters required",
+            },
+            },
+        });
+        </script>
+
       <style>
-      
+      .error {
+      color: red;
+   }
       /* BASIC */
       
       /* html {

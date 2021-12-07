@@ -7,6 +7,7 @@ from django.contrib import messages
 # Create your views here.
 
 def addproduct(request):
+    categories = Categories.objects.all()
     subcategories = SubCategories.objects.all()
     if request.method == 'POST':
         product_name = request.POST['product_name']
@@ -14,38 +15,33 @@ def addproduct(request):
              messages.error(
                 request, "product already exists pls choose edit option")
              return redirect(addproduct)
-        url_slug = request.POST['url_slug']
-        if Products.objects.filter(url_slug=url_slug):
-            messages.error(
-                request, "url_slug already exists pls choose edit option")
-            return redirect(addproduct)
+        slug = product_name.replace(" ", "-").lower()
         brand = request.POST['brand']
+        stock = request.POST['stock']
         product_max_price = request.POST['product_max_price']
         product_discount_price = request.POST['product_discount_price']
         product_description = request.POST['product_description']
+        category_id = request.POST.get('Category')
+        prod_instance = Categories.objects.get(id=category_id)
         SubCategories_id = request.POST['SubCategory']
-        image1=request.FILES['image1']   
+        image1=request.FILES.get('image1')   
         product_instance =SubCategories.objects.get(id =SubCategories_id)
-        Products.objects.create(product_name=product_name,url_slug=url_slug,brand=brand,product_max_price=product_max_price,product_discount_price=product_discount_price,product_description=product_description,SubCategories_id=product_instance,image1=image1)
+        Products.objects.create(product_name=product_name,url_slug=slug,brand=brand,stock=stock,product_max_price=product_max_price,product_discount_price=product_discount_price,product_description=product_description,SubCategories_id=product_instance,category=prod_instance,image1=image1)
         return redirect(addproduct)
         
-    return render(request, 'addproducts.html',{'subcategories':subcategories})
+    return render(request, 'addproducts.html',{'subcategories':subcategories,'categories':categories})
 
 def Category(request):
     if request.method == 'POST':
-        title = request.POST['title']
+        title = request.POST['title'].lower()
         if Categories.objects.filter(title=title):
             messages.error(
                 request, "category already exists pls choose edit option")
             return redirect(Category)
-        url_slug = request.POST['url_slug']
-        if Categories.objects.filter(url_slug=url_slug):
-            messages.error(
-                request, "category already exists pls choose edit option")
-            return redirect(Category)
-        thumbnail = request.POST['thumbnail']
+        slug = title.replace(" ", "-").lower()
         description = request.POST['description']
-        Categories.objects.create(title=title,url_slug=url_slug,thumbnail=thumbnail,description=description)
+        cat_image=request.FILES.get('cat_image')
+        Categories.objects.create(title=title,slug=slug,description=description,cat_image=cat_image)
         return redirect(Category)
     else:
         return render(request, 'addcategory.html')  
@@ -58,16 +54,11 @@ def SubCategory(request):
             messages.error(
                 request, "SubCategory already exists pls choose edit option")
             return redirect(SubCategory)
-        url_slug = request.POST['url_slug']
-        if SubCategories.objects.filter(url_slug=url_slug):
-            messages.error(
-                request, "SubCategory already exists pls choose edit option")
-            return redirect(SubCategory)
-        thumbnail = request.POST['thumbnail']
+        url_slug = title.replace(" ", "-").lower()
         description = request.POST['description']
         category_id = request.POST['Category']
         cat_instance =Categories.objects.get(id =category_id)
-        SubCategories.objects.create(title=title,url_slug=url_slug,thumbnail=thumbnail,description=description,category_id =cat_instance)
+        SubCategories.objects.create(title=title,url_slug=url_slug,description=description,category_id =cat_instance)
         return redirect(SubCategory)
     return render(request, 'subcategory.html',{'categories':categories} )
 
@@ -100,7 +91,7 @@ def delsubcategory(request, title):
         messages.sucess(request, "The category is deleted")
     except:
         messages.error(request, "The category not found")
-    return redirect(categoryhome)
+    return redirect(subcategoryhome)
 
 def delproduct(request, id):
     try:
@@ -116,16 +107,10 @@ def editcategory(request, title):
     categories = Categories.objects.get(title=title)
     if request.method == 'POST':
         title = request.POST['title']
-        url_slug = request.POST['url_slug']
-        thumbnail = request.POST['thumbnail']
         description = request.POST['description']
 
         if title != '':
             categories.title = title
-        if thumbnail != '':
-            categories.thumbnail = thumbnail
-        if url_slug != '':
-            categories.url_slug = url_slug
         if description != '':
             categories.description = description
             categories.save()
@@ -138,16 +123,10 @@ def editsubcategory(request, title):
     subcategories = SubCategories.objects.get(title=title)
     if request.method == 'POST':
         title = request.POST['title']
-        url_slug = request.POST['url_slug']
-        thumbnail = request.POST['thumbnail']
         description = request.POST['description']
 
         if title != '':
             subcategories.title = title
-        if thumbnail != '':
-            subcategories.thumbnail = thumbnail
-        if url_slug != '':
-            subcategories.url_slug = url_slug
         if description != '':
             subcategories.description = description
             subcategories.save()
@@ -160,7 +139,6 @@ def editproduct(request, id):
     subcategories = SubCategories.objects.all()
     if request.method == 'POST':
         product_name = request.POST['product_name']
-        url_slug = request.POST['url_slug']
         brand = request.POST['brand']
         product_max_price= request.POST['product_max_price']
         product_discount_price = request.POST['product_discount_price']
@@ -169,8 +147,6 @@ def editproduct(request, id):
             products.product_name = product_name
         if brand != '':
             products.brand = brand
-        if url_slug != '':
-            products.url_slug = url_slug
         if product_description != '':
             products.product_description = product_description
         if product_max_price != '':
