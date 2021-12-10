@@ -13,7 +13,7 @@ from carts.models import Cart, CartItems
 from category.models import Address, Products
 from django.http import JsonResponse
 import json
-# from carts.views import _cart_id
+from carts.views import _cart_id
 import requests
 from orders.models import Order, OrderItems
 from orders.views import orders
@@ -197,8 +197,22 @@ def check_otp(request,phone_number):
 
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def productdetails(request,id):
-    print(id)
     products = Products.objects.filter(id=id)
+    # in_cart = CartItems.objects.filter(cart__cart_id=_cart_id(request),product=products).exists()
+    # print(in_cart)
+    for pro in products:
+        if pro.offer_name != None:
+            pro.product_discount_price =  pro.product_discount_price-(pro.product_discount_price/pro.offer_percent)
+        else:
+            pass
+    # try:
+    #     in_cart = CartItems.objects.filter(cart__cart_id=_cart_id(request),product=products).exists()
+    #     return HttpResponse(in_cart)
+    #     exit()  
+    # except:
+    #     print('except')
+    #     pass
+
     return render(request, 'productdetails.html',{'products':products})
 
 def userdetails(request):

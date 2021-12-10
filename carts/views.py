@@ -330,12 +330,69 @@ def payment_error(request):
 
 def razorpay_payment(request):
     if request.method == 'POST':
-            amount = 100,
-            currency = "INR",
-            client = razorpay.Client(auth=("rzp_test_EBo2ZDIjBvXvjr", "QnRCAOb0PBbntTMLIkK9y9Y6"))
 
-            payment=client.order.create({'amount':amount,'currency':'INR','payment_capture':'1'})
-    return
+        body = json.loads(request.body)
+
+        transaction_id = body['transID']
+
+        id = request.user.id
+
+        current_user = Account.objects.get(id = id)
+
+        address_id = body['address_id']
+        print('address id:',address_id)
+        current_user_address = Address.objects.get(id = address_id) 
+        print(current_user_address)
+
+        delivery_status = 'ordered'
+
+        ordered_address = current_user_address.first_name + ", \n" + \
+        current_user_address.address_line_1 + "\n" + \
+        current_user_address.state + ", " + str(current_user_address.pincode) + "\n" + \
+        current_user_address.country + " ,\n" + \
+        current_user_address.phone_number 
+
+        new_order = Order.objects.create(user = current_user,order_id  = body['orderID'], payment_method = body['payment_methods'], delivered_address = ordered_address, delivery_status = delivery_status, payment_status = body['status'], grand_total = body['grand_total'] )
+        print(new_order)
+        Payment.objects.create(user = current_user, payment_id = body['transID'], payment_method = body['payment_methods'], amount_paid = body['grand_total'], status = body['status'], order = new_order  )
+        #moving the cart products to order items 
+
+        cart_items = CartItems.objects.filter(user = current_user)
+        print(cart_items)
+        for item in cart_items:
+            print('hii')
+            sub=item.sub_total()
+            print(sub)
+            OrderItems.objects.create(quantity = item.quantity, products_id = item.product, sub_total = sub, user = current_user, order = new_order)
+
+            #reducing the product stock
+            print('hello')
+            product = Products.objects.get(id = item.product.id)
+            print(product)
+            # product.stocks -= item.quantity
+            product.save()
+
+        cart_items.delete()
+
+        # Taking new order id
+        new_order_id = new_order.id
+
+        print(new_order_id)
+        print(transaction_id)
+        order_id = request.GET.get('order_id')
+        current_order = Order.objects.get(id = order_id),
+        grand_total=current_order.grand_total
+        amount = grand_total*100
+        currency = "INR"
+        data = {
+            'new_order_id' :new_order_id ,
+            'transID' : transaction_id,
+            'amount':amount,
+            'currency':currency
+        }
+        client = razorpay.Client(auth=("rzp_test_EBo2ZDIjBvXvjr", "QnRCAOb0PBbntTMLIkK9y9Y6"))
+        payment=client.order.create(data=data)
+        return JsonResponse(data, safe=False)
 
 # deleting cart item
 

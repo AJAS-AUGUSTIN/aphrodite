@@ -4,8 +4,13 @@ from django.urls.resolvers import URLPattern
 
 urlpatterns = [
     path('',views.store, name='store'),
-    path('<slug:subcategory_slug>',views.store,name='products_by_subcategory'),
-    # path('<slug:category_slug>',views.store_q,name='products_by_category'),
+    path('category/<slug:category_slug>',views.store,name='products_by_category'),
+    # path('<slug:subcategory_slug>',views.store,name='products_by_subcategory'),
+    path('search/',views.search,name='search'),
+
+
+    
+    # do product slug
     
 
 

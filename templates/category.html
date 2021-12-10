@@ -304,7 +304,8 @@ $(document).ready(function(){
 							<th>Description</th>
 							<th>Created At</th>
                             <th>Status</th>
-							<th>Image</th>
+							<th>Offer</th>
+							<!-- <th>Image</th> -->
 
 						</tr>
 					</thead>
@@ -322,7 +323,8 @@ $(document).ready(function(){
 							<td>{{category.description}}</td>
 							<td>{{category.created_at}}</td>
                             <td>{{category.is_active}}</td>
-							<td>{{category.cat_image}}</td>
+							<td>{{category.offer}}</td>
+							<!-- <td>{{category.cat_image}}</td> -->
 							<td>
 								<a href="{% url 'editcategory' category.title %}" class="edit" data-toggle="modal"><i class="material-icons" data-toggle="tooltip" title="Edit">&#xE254;</i></a>
 								<a href="{% url 'delcategory' category.title %}" class="delete" data-toggle="modal"><i class="material-icons" data-toggle="tooltip" title="Delete">&#xE872;</i></a>

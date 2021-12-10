@@ -21,7 +21,7 @@
 <div class="container">
 
 <header class="section-heading">
-	<a href="./store.html" class="btn btn-outline-dark float-right">See all</a>
+	<a href="{% url 'store' %}" class="btn btn-outline-dark float-right">See all</a>
 	<h3 class="section-title">Popular products</h3>
 
 	<!-- cart -->
@@ -59,7 +59,11 @@
 			<figcaption class="info-wrap">
 				<div class="price mt-1">{{prd.brand}}</div>
 				<a href="{% url 'productdetails' prd.id %}" class="title">{{prd.product_name}}</a>
-				<div class="price mt-1">₹{{prd.product_discount_price}}</div> <!-- price-wrap.// -->
+				<div style="display: flex;" class="price mt-1">₹{{prd.product_discount_price}} <!-- price-wrap.// -->
+				{% if prd.offer_name != None %}
+					<p style="margin-left: 120px;color: yellowgreen;">{{prd.offer_percent}}% offer</p> <!-- price-wrap.// -->
+				{% endif %}
+				</div>
 				<!-- <button data-product="{{product.id}}" data-action="add" class="btn btn-outline-secondary add-btn update-cart">Add to Cart</button> -->
 			</figcaption>
 		</div>

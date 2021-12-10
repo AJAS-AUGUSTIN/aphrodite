@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect
 from accounts.models import Account
 import category
-from category.models import Address, Categories, Products, SubCategories
+from category.models import Address, Categories, Offer, Products, SubCategories
 from django.contrib import messages
 
 # Create your views here.
@@ -178,3 +178,77 @@ def add_address(request):
     else:
         return render(request,'address.html')
 
+def add_offer(request):
+    if request.method == 'POST':
+        offer_name      = request.POST['offer_name']
+        offer_percent   = request.POST['offer_percent']
+        expiry_date     = request.POST['expiry_date']
+        expiry_time     = request.POST['expiry_time']
+        
+        offer = Offer.objects.create(offer_name=offer_name,offer_percent=offer_percent,expiry_date=expiry_date,expiry_time=expiry_time)
+    else:
+        return render(request,'add_offer.html')
+    return render(request,'add_offer.html')
+
+def view_offer(request):
+    offers = Offer.objects.all()
+    return render(request,'view_offer.html',{'offers':offers})
+
+def edit_offer(request,id):
+    offers = Offer.objects.get(id=id)
+    if request.method == 'POST':
+        offers.offer_name      = request.POST['offer_name']
+        offers.offer_percent   = request.POST['offer_percent']
+        offers.expiry_date     = request.POST['expiry_date']
+        offers.expiry_time     = request.POST['expiry_time']
+        offers.save()
+        return redirect('view_offer')  
+    else:
+        return render(request,'edit_offer.html',{'offers':offers})
+
+def delete_offer(request,id):
+    try:
+        offers = Offer.objects.get(id=id)
+        offers.delete()
+        messages.sucess(request, "The offer is deleted")
+    except:
+        messages.error(request, "The offer not found")
+    return redirect('view_offer')
+    
+def add_category_offer(request):
+    categories = Categories.objects.all()
+    offers = Offer.objects.all()
+    category_offer = "category offer"
+    context = {
+        'offers':offers,
+        'categories':categories
+    }
+    if request.method == 'POST':
+        category_id = request.POST['hidden_category_id']
+        categories = Categories.objects.get(id = category_id)
+        offer = request.POST.get('offer')
+        print(offer)
+        offers = Offer.objects.get(id = offer)
+        categories.offer = offers
+        categories.save()
+
+        products = Products.objects.filter(category = category_id)
+        for product in products:
+            product.offer_type = category_offer
+            product.offer_name = offers.offer_name           
+            product.offer_percent = offers.offer_percent         
+            product.expiry_date = offers.expiry_date         
+            product.expiry_time = offers.expiry_time
+            product.save()
+        return redirect('add_category_offer')
+    elif request.method == 'GET':
+        return render(request,'add_category_offer.html',context)
+
+def delete_category_offer(request,id):
+    # category_id = request.POST.get('hidden_category_id')
+    # print(category_id)
+    # categories = Categories.objects.get(id = category_id)
+    offers = Offer.objects.get(id = id)
+    offers.delete()
+    return render(request,'add_category_offer.html')
+        

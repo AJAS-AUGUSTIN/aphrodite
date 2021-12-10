@@ -137,13 +137,26 @@
 <h2 class="title">{{product.brand}} {{product.product_name}}</h2>
 
 <div class="mb-3"> 
-	<var class="price h4">₹{{product.product_discount_price}}</var> 
+	<var class="price h4">₹{{product.product_discount_price}}</var>
+  <!-- <del><var class="price h6">₹{{product.product_max_price}}</var></del> -->
+  {% if product.offer_name != None %}
+					<p style="color: yellowgreen;">{{product.offer_percent}}% offer</p> <!-- price-wrap.// -->
+	{% endif %}
 </div> 
 
 <p>{{product.product_description}}</p>
 <p>{{product.product_long_description}}</p>
 <!-- <button href="" data-product="{{product.id}}" data-action="add" class="btn btn-outline-secondary add-btn update-cart">Add to Cart</button> -->
+{% if product.stock <= 0 %}
+<h5>Out of stock</h5>
+{% else %}
+  {% if in_cart %}
+	<a href="" class="btn  btn-sucess" > <span class="text">Added to cart</span> <i class="fas fa-check"></i>  </a>
+
+  {% else %}
 	<a href="{% url 'add_cart' product.id %}" class="btn  btn-dark" > <span class="text">Add to cart</span> <i class="fas fa-shopping-cart"></i>  </a>
+  {% endif %}
+{% endif %}
 </article> <!-- product-info-aside .// -->
 		</main> <!-- col.// -->
 	</div> <!-- row.// -->

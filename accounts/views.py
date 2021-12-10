@@ -124,10 +124,12 @@ def adminhome(request):
     if request.session.has_key('admin'):
         print('index req received')
         if 'search' in request.POST:
+            print('seaarch')
             search = request.POST['search']
             user = Account.objects.filter(username__icontains=search)
             return render(request, 'adminhome.html', {'users': user})
         else:
+            print('elsecaseeeeee')
             return render(request, 'adminhome.html', {'users': user})
     elif request.method == 'POST':
         print('index POST req received')
