@@ -222,6 +222,8 @@ def place_order(request):
 
         if payment_method == 'cash on delivery':
             CartItems.objects.filter(user = ordered_user).delete()
+            product.stock -= items.quantity
+            product.save()
 
             context = {
                     'order_id': order_id,
@@ -279,7 +281,7 @@ def paypal_payment(request):
         print('hello')
         product = Products.objects.get(id = item.product.id)
         print(product)
-        # product.stocks -= item.quantity
+        product.stock -= item.quantity
         product.save()
 
     cart_items.delete()

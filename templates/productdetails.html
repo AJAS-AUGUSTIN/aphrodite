@@ -148,7 +148,7 @@
 <p>{{product.product_long_description}}</p>
 <!-- <button href="" data-product="{{product.id}}" data-action="add" class="btn btn-outline-secondary add-btn update-cart">Add to Cart</button> -->
 {% if product.stock <= 0 %}
-<h5>Out of stock</h5>
+<h5 style="color: red;">Out of stock</h5>
 {% else %}
   {% if in_cart %}
 	<a href="" class="btn  btn-sucess" > <span class="text">Added to cart</span> <i class="fas fa-check"></i>  </a>

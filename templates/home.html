@@ -61,7 +61,7 @@
 				<a href="{% url 'productdetails' prd.id %}" class="title">{{prd.product_name}}</a>
 				<div style="display: flex;" class="price mt-1">₹{{prd.product_discount_price}} <!-- price-wrap.// -->
 				{% if prd.offer_name != None %}
-					<p style="margin-left: 120px;color: yellowgreen;">{{prd.offer_percent}}% offer</p> <!-- price-wrap.// -->
+					<p style="margin-left: 100px;color: yellowgreen;">{{prd.offer_percent}}% offer</p> <!-- price-wrap.// -->
 				{% endif %}
 				</div>
 				<!-- <button data-product="{{product.id}}" data-action="add" class="btn btn-outline-secondary add-btn update-cart">Add to Cart</button> -->

@@ -19,34 +19,32 @@
 				<div class="table-title">
 					<div class="row">
 						<div class="col-xs-6">
-							<h2>Manage <b>Category Offer</b></h2>
+							<h2>Manage <b>Product Offer</b></h2>
 						</div>
 					</div>
 				</div>
 				<table class="table table-striped table-hover">
 					<thead>
 						<tr>
-							<th>Category Name</th>
+							<th>Product Name</th>
 							<th>Slug</th>
+                            <th>Brand</th>
 							<th>Description</th>
-							<th>Created At</th>
-                            <th>Status</th>
 							<th>Apply offer</th>
 
 						</tr>
 					</thead>
-          {% for category in categories %}
-          <form id="form" action="{% url 'add_category_offer' %}" method="POST" enctype='multipart/form-data'>
+          {% for product in products %}
+          <form id="form" action="{% url 'add_product_offer' %}" method="POST" enctype='multipart/form-data'>
             {% csrf_token %}
 					<tbody>
 						<tr>
-							<td>{{category.title}}</td>
-							<td>{{category.slug}}</td>
-							<td>{{category.description}}</td>
-							<td>{{category.created_at}}</td>
-                            <td>{{category.is_active}}</td>
+							<td>{{product.product_name}}</td>
+							<td>{{product.url_slug}}</td>
+                            <td>{{product.brand}}</td>
+							<td>{{product.product_description}}</td>
 							<td><select class="form-select" name="offer" aria-label="Default select example">
-								<option value="">{{category.offer_name}}</option>
+								<option value="">{{product.offer_name}}</option>
 								<option value="none">None</option>
 								{% for offer in offers %}
 							<option value="{{offer.offer_name}}">{{offer.offer_name}}</option>
@@ -55,8 +53,9 @@
 							<td>
                                 <input type="submit" class="fadeIn fourth" value="Save"><br>
 							</td>
-							<td><a href="" class="delete" data-toggle="modal"><i class="material-icons" data-toggle="tooltip" title="Delete">&#xE872;</i></a></td>
-                            <input type="hidden" value="{{category.id}}" name="hidden_category_id">
+							<!-- <td><a href="" class="delete" data-toggle="modal"><i class="material-icons" data-toggle="tooltip" title="Delete">&#xE872;</i></a></td> -->
+                            <input type="hidden" value="{{product.id}}" name="hidden_product_id">
+                            <input type="hidden" value="{{product.category.id}}" name="hidden_category_id">
 						</tr>
 					</tbody>
                     </form>

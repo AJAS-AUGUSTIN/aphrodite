@@ -12,7 +12,7 @@ import category
 
 # Create your models here.
 class Offer(models.Model):
-    offer_name      = models.CharField(max_length=100,null=True)
+    offer_name      = models.CharField(max_length=100,null=True,unique=True)
     offer_percent   = models.IntegerField()
     expiry_date     = models.DateField()
     expiry_time     = models.TimeField()
@@ -27,7 +27,7 @@ class Categories(models.Model):
     created_at    = models.DateTimeField(auto_now_add=True)
     is_active     = models.IntegerField(default=1)
     cat_image     = models.ImageField(upload_to ='pics/categories',blank=True)
-    # offer_name    = models.CharField(max_length=100,null=True)
+    offer_name    = models.CharField(max_length=100,null=True)
 
     def __str__(self):
         return self.title
@@ -71,6 +71,8 @@ class Products(models.Model):
     expiry_date              = models.DateField(null=True)
     expiry_time              = models.TimeField(null=True)
 
+    def get_url(self):
+        return reverse('productdetails',args=[self.category.slug,self.url_slug])
 
     def __str__(self):
         return self.product_name

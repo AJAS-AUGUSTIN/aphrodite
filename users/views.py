@@ -202,7 +202,10 @@ def productdetails(request,id):
     # print(in_cart)
     for pro in products:
         if pro.offer_name != None:
-            pro.product_discount_price =  pro.product_discount_price-(pro.product_discount_price/pro.offer_percent)
+            try:
+                pro.product_discount_price =  pro.product_discount_price-(pro.product_discount_price/pro.offer_percent)
+            except ZeroDivisionError:
+                pass
         else:
             pass
     # try:

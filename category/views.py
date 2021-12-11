@@ -1,3 +1,4 @@
+from django.http import request
 from django.shortcuts import render, redirect
 from accounts.models import Account
 import category
@@ -140,6 +141,7 @@ def editproduct(request, id):
     if request.method == 'POST':
         product_name = request.POST['product_name']
         brand = request.POST['brand']
+        stock = request.POST['stock']
         product_max_price= request.POST['product_max_price']
         product_discount_price = request.POST['product_discount_price']
         product_description=request.POST['product_description']
@@ -147,6 +149,8 @@ def editproduct(request, id):
             products.product_name = product_name
         if brand != '':
             products.brand = brand
+        if stock != '':
+            products.stock = stock
         if product_description != '':
             products.product_description = product_description
         if product_max_price != '':
@@ -228,19 +232,36 @@ def add_category_offer(request):
         categories = Categories.objects.get(id = category_id)
         offer = request.POST.get('offer')
         print(offer)
-        offers = Offer.objects.get(id = offer)
-        categories.offer = offers
-        categories.save()
+        if offer != 'none':
+            offers = Offer.objects.get(offer_name = offer)
+            offer_name = offers.offer_name
+            categories.offer_name = offer_name
+            categories.save()
 
-        products = Products.objects.filter(category = category_id)
-        for product in products:
-            product.offer_type = category_offer
-            product.offer_name = offers.offer_name           
-            product.offer_percent = offers.offer_percent         
-            product.expiry_date = offers.expiry_date         
-            product.expiry_time = offers.expiry_time
-            product.save()
-        return redirect('add_category_offer')
+            products = Products.objects.filter(category = category_id)
+            for product in products:
+                product.offer_type = category_offer
+                product.offer_name = offers.offer_name           
+                product.offer_percent = offers.offer_percent         
+                product.expiry_date = offers.expiry_date         
+                product.expiry_time = offers.expiry_time
+                product.save()
+            return redirect('add_category_offer')
+        else:
+            categories.offer_name = 'none'
+            categories.save()
+            
+            products = Products.objects.filter(category = category_id)
+            for product in products:
+                product.offer_type = None
+                product.offer_name = None          
+                product.offer_percent = None        
+                product.expiry_date = None      
+                product.expiry_time = None
+                product.save()
+            return redirect('add_category_offer')
+
+        
     elif request.method == 'GET':
         return render(request,'add_category_offer.html',context)
 
@@ -251,4 +272,63 @@ def delete_category_offer(request,id):
     offers = Offer.objects.get(id = id)
     offers.delete()
     return render(request,'add_category_offer.html')
+
+
+def add_product_offer(request):
+    categories = Categories.objects.all()
+    products = Products.objects.all()
+    offers = Offer.objects.all()
+    category_id = request.POST.get('hidden_category_id')
+    context = {
+        'products':products,
+        'offers':offers,
+    }
+    if request.method == 'POST':
+        product_id = request.POST['hidden_product_id']
+        print(product_id)
+        offer = request.POST.get('offer')
+        print(offer)
+        if offer != 'none':
+            offers = Offer.objects.get(offer_name = offer)
+            offer_name = offers.offer_name
+
+            products = Products.objects.get(id = product_id)
+            products.offer_type = "product_offer"
+            products.offer_name = offers.offer_name           
+            products.offer_percent = offers.offer_percent         
+            products.expiry_date = offers.expiry_date         
+            products.expiry_time = offers.expiry_time
+            products.save()
+            return redirect('add_product_offer')
+        else:                                       
+            products = Products.objects.get(id = product_id)
+            offer_name = products.category.offer_name
+            print(products)
+            print(offer_name)
+            category = Categories.objects.get(id = category_id)
+            print(category.offer_name)
+            try:
+                offer = Offer.objects.get(offer_name=category.offer_name)
+                if offer_name:
+                    products.offer_type = "category offer"
+                    products.offer_name = category.offer_name         
+                    products.offer_percent = offer.offer_percent        
+                    products.expiry_date = offer.expiry_date
+                    products.expiry_time = offer.expiry_time
+                    products.save()
+                    return redirect('add_product_offer')
+                else:
+                    pass
+            except:
+                    products.offer_type = None
+                    products.offer_name = None          
+                    products.offer_percent = None        
+                    products.expiry_date = None      
+                    products.expiry_time = None
+                    products.save()
+                    return redirect('add_product_offer')
+
+    elif request.method == 'GET':
+        return render(request,'add_product_offer.html',context)
+
         

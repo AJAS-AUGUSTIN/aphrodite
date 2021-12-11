@@ -45,7 +45,7 @@
                 </div> <!-- card-body.// -->
             </div>
         </article> <!-- filter-group  .// -->
-        <article class="filter-group">
+        <!-- <article class="filter-group">
             <header class="card-header">
                 <a href="#" data-toggle="collapse" data-target="#collapse_4" aria-expanded="true" class="">
                     <i class="icon-control fa fa-chevron-down"></i>
@@ -73,9 +73,9 @@
                     <input type="checkbox">
                     <span class="btn btn-light"> XXL </span>
                   </label>
-            </div><!-- card-body.// -->
+            </div> card-body.// 
             </div>
-        </article> <!-- filter-group .// -->
+        </article> filter-group .// -->
         
         <article class="filter-group">
             <header class="card-header">
@@ -150,7 +150,17 @@
                             <del class="price-old">₹{{product.product_max_price}}</del>
                         </div> <!-- price-wrap.// -->
                     </div>
-                    <a href="{% url 'add_cart' product.id %}" class="btn btn-block btn-primary">Add to cart </a>
+                    {% if product.stock <= 0 %}
+                        <h5 style="color: red;">Out of stock</h5>
+                    {% else %}
+                    {% if in_cart %}
+	                    <a href="" class="btn  btn-sucess" > <span class="text">Added to cart</span> <i class="fas fa-check"></i>  </a>
+
+                    {% else %}
+	                    <a href="{% url 'add_cart' product.id %}" class="btn  btn-dark" > <span class="text">Add to cart</span> <i class="fas fa-shopping-cart"></i>  </a>
+                    {% endif %}
+                    {% endif %}
+                    <!-- <a href="{% url 'add_cart' product.id %}" class="btn btn-block btn-primary">Add to cart </a> -->
                 </figcaption>
             </figure>
         </div> <!-- col.// -->
