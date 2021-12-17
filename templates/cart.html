@@ -124,13 +124,14 @@
 		data:data,
 		dataType:"html",
 		success:function(){
-			$("#cart_list").load(location.href+"#cart_list");
+			// $("#cart_list").load(location.href+"#cart_list");
+			// $("#cart_list_nav").load(location.href+"#cart_list_nav");
 			setInterval('refreshPage()', 1000);
 
 		}
 	});
 	
-	$("#cart_list_nav").load(location.href+"#cart_list_nav");
+	
 
     swal("Your cart item has been removed", {
       icon: "success",

@@ -13,8 +13,6 @@ class CartItems(models.Model):
     user = models.ForeignKey(Account,on_delete=models.CASCADE,null=True)
     product = models.ForeignKey(Products,on_delete=models.CASCADE)
     cart = models.ForeignKey(Cart,on_delete=models.CASCADE,null=True)
-    sub_total = models.IntegerField(null=True)
-    anonymous_user = models.CharField(max_length=50,blank=True)
     quantity = models.IntegerField()
     is_active = models.BooleanField(default=True)
 

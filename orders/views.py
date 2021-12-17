@@ -4,7 +4,7 @@ from category.models import Address
 # from .forms import OrderForm
 import datetime
 
-from orders.models import Order
+from orders.models import Order, OrderItems
 
 # Create your views here.
 
@@ -26,3 +26,9 @@ def statuschange(request,id):
     else:
         pass
 
+def sales_report(request):
+    orders = OrderItems.objects.all()
+    context = {
+        'orders':orders
+    }
+    return render(request,'sales_report.html',context)

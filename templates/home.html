@@ -54,16 +54,32 @@
 <div class="row">
 	{% for prd in product %}
 	<div class="col-md-3">
-		<div class="card card-product-grid">
+		<div class="card card-product-grid" style="height: 410px;">
 			<a href="{% url 'productdetails' prd.id %}" class="img-wrap"> <img src="{{ prd.image1.url}}"> </a>
 			<figcaption class="info-wrap">
 				<div class="price mt-1">{{prd.brand}}</div>
 				<a href="{% url 'productdetails' prd.id %}" class="title">{{prd.product_name}}</a>
 				<div style="display: flex;" class="price mt-1">₹{{prd.product_discount_price}} <!-- price-wrap.// -->
 				{% if prd.offer_name != None %}
-					<p style="margin-left: 100px;color: yellowgreen;">{{prd.offer_percent}}% offer</p> <!-- price-wrap.// -->
+					{% if prd.stock != 0 %}
+						<p style="margin-left: 100px;color: yellowgreen;">{{prd.offer_percent}}% offer</p> <!-- price-wrap.// -->
+					{% else %}
+					<p style="margin-left: 100px;color: yellowgreen;"></p> <!-- price-wrap.// -->
+					{% endif %}
 				{% endif %}
 				</div>
+				{% if prd.stock <= 0 %}
+                        <h5 style="color: red; margin-top:65px ">Out of stock</h5>
+                    {% else %}
+                    {% if cart in_cart %}
+	                    <a href="" class="btn  btn-sucess" style="width: -moz-available; margin-top:10px"  > <span class="text">Added to cart</span> <i class="fas fa-check"></i>  </a>
+                    {% else %}
+	                    <a href="{% url 'add_cart' prd.id %}" style="width: -moz-available; margin-top:10px "  class="btn  btn-dark" > <span class="text">Add to cart</span> <i class="fas fa-shopping-cart"></i>  </a>
+                    {% endif %}
+					<a href="{% url 'buy_now' prd.id %}" class="btn  btn-dark" style="width: -moz-available; margin-top: 10px;" > <span class="text">Buy Now</span> <i class="fas fa-buy"></i>  </a>
+                {% endif %}
+				
+
 				<!-- <button data-product="{{product.id}}" data-action="add" class="btn btn-outline-secondary add-btn update-cart">Add to Cart</button> -->
 			</figcaption>
 		</div>

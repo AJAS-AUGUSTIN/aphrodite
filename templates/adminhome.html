@@ -279,11 +279,11 @@ $(document).ready(function(){
 	<!-- <a class="nav-link" style="margin-left: 95%;" href="adminlogout">Logout</a> -->
     <div class="container">
 	
-		<form action="{% url 'adminlogin' %}" method="POST">
+		<form action="{% url 'adminhome' %}" method="POST">
 			{% csrf_token %}
 		<div class="input-group">
 			<div class="form-outline" style="margin-top: 20px;">
-			  <input  name="search" type="search" id="form1" class="form-control" />
+			  <input  name="search" type="search" id="search" class="form-control" />
 			  <label class="form-label" for="form1">Search</label>
 			</div>
 			<button type="submit" class="btn btn-primary">
@@ -299,8 +299,6 @@ $(document).ready(function(){
 							<h2>Manage <b>Users</b></h2>
 						</div>
 						<div class="col-xs-6">
-							<!-- <a href="adminregistration.html" class="btn btn-success" data-toggle="modal"><i class="material-icons">&#xE147;</i> <span>Add New User</span></a> -->
-							<!-- <a href="#deleteEmployeeModal" class="btn btn-danger" data-toggle="modal"><i class="material-icons">&#xE15C;</i> <span>Delete</span></a>						 -->
 						</div>
 					</div>
 				</div>

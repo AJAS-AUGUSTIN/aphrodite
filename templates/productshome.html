@@ -344,7 +344,7 @@ $(document).ready(function(){
 							<td>{{product.created_at}}</td>
                             <td>{{product.stock}}</td>
                             <td>{{product.is_active}}</td>
-							<td>{{product.image1}}</td>
+							<td><img src="{{product.image1.url}}" style="width: 50px;" alt="{{product.image1}}"></td>
 							<td>
 								<a href="{% url 'editproduct' product.id %}" class="edit" data-toggle="modal"><i class="material-icons" data-toggle="tooltip" title="Edit">&#xE254;</i></a>
 								<a href="{% url 'delproduct' product.id %}" class="delete" data-toggle="modal"><i class="material-icons" data-toggle="tooltip" title="Delete">&#xE872;</i></a>

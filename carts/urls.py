@@ -10,9 +10,13 @@ urlpatterns = [
     path('remove_cart_item/',views.remove_cart_item,name='remove_cart_item'),
     path('checkout/',views.checkout,name='checkout'),
     path('final/',views.final,name='final'),
-    path('place_order',views.place_order,name='place_order'),
-    path('paypal_payment',views.paypal_payment,name='paypal_payment'),
-    path('paypal_payment_success',views.paypal_payment_success,name='paypal_payment_success'),
-    path('payment_error',views.payment_error,name='payment_error'),
-    path('razorpay_payment',views.razorpay_payment,name='razorpay_payment'),
+    path('place_order/',views.place_order,name='place_order'),
+    path('paypal_payment/',views.paypal_payment,name='paypal_payment'),
+    path('paypal_payment_success/',views.paypal_payment_success,name='paypal_payment_success'),
+    path('payment_error/',views.payment_error,name='payment_error'),
+    # path('razorpay_payment',views.razorpay_payment,name='razorpay_payment'),
+    path('razor_pay_details/',views.razor_pay_details,name='razor_pay_details'),
+    path('buy_now/<int:id>/',views.buy_now,name='buy_now'),
+    
+
 ]

@@ -200,14 +200,6 @@ def productdetails(request,id):
     products = Products.objects.filter(id=id)
     # in_cart = CartItems.objects.filter(cart__cart_id=_cart_id(request),product=products).exists()
     # print(in_cart)
-    for pro in products:
-        if pro.offer_name != None:
-            try:
-                pro.product_discount_price =  pro.product_discount_price-(pro.product_discount_price/pro.offer_percent)
-            except ZeroDivisionError:
-                pass
-        else:
-            pass
     # try:
     #     in_cart = CartItems.objects.filter(cart__cart_id=_cart_id(request),product=products).exists()
     #     return HttpResponse(in_cart)
@@ -225,7 +217,7 @@ def userdetails(request):
         order = Order.objects.filter(user = user)
         product = Products.objects.filter(id=user.id)
         context = {
-            'order':order,
+            # 'order':order,
             'order_item':order_item,
             'product':product,
         }

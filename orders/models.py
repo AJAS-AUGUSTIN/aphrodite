@@ -23,7 +23,6 @@ class OrderItems(models.Model):
     user = models.ForeignKey(Account,on_delete=models.CASCADE,null=True)
     products_id = models.ForeignKey(Products,on_delete=models.CASCADE,null=True)
     quantity = models.IntegerField()
-    anonymous_user = models.CharField(max_length=50, blank=True)
     is_active = models.BooleanField(default=True)
     sub_total = models.IntegerField(null=True)
     created_at = models.DateTimeField(auto_now_add=True)

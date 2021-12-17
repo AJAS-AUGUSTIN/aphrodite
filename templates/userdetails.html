@@ -8,8 +8,8 @@
 <!-- ========================= SECTION CONTENT ========================= -->
 <section class="section-conten padding-y bg">
 
-<div class="container">
-	<div class="row">
+<!-- <div class="container"> -->
+	<div class="row p-4">
 	<aside class="col-md-3">
 		<!--   SIDEBAR   -->
 		<ul class="list-group">
@@ -23,59 +23,61 @@
 		<!--   SIDEBAR .//END   -->
 	</aside>
 	<main class="col-md-9">
-		{% for order in order %}
+		{% for ord in order_item %}
 
 		<article class="card">
 		<header class="card-header">
-			<strong class="d-inline-block mr-3">Order ID: {{order.id}}</strong>
+			<strong class="d-inline-block mr-3">Order ID: {{ord.order.id}}</strong>
 			<!-- <span>Order Date: 16 December 2018</span> -->
 		</header>
 		<div class="card-body">
-			<div class="row"> 
-				<div class="col-md-6">
-					<h6 class="text-muted">Delivery to</h6>
-					<p> 
-					{{order.delivered_address}}
-			 		</p>
+			<div class="row">
+				<div class="col-md-3">
+					<h6 class="text-muted"></h6>
+					<span class="text-success">
+					    <img src="{{ord.products_id.image1.url}}" alt="{{ord.products_id.image1}}" style="width: 50px;">
+					</span>
 				</div>
-				<div class="col-md-6">
-					<h6 class="text-muted">Product</h6>
-					<p> 
-					{{order.delivered_address}}
-			 		</p>
+				<div class="col-md-3">
+					<h6 class="text-muted">Product Name</h6>
+					<span class="text-success">
+					    {{ord.products_id.product_name}}
+					</span>
 				</div>
-				<div class="col-md-4">
+				<div class="col-md-3">
+					<h6 class="text-muted">Amount</h6>
+					<span class="text-success">
+					    {{ord.sub_total}}  
+					</span>
+				</div>
+				<div class="col-md-3">
 					<h6 class="text-muted">Payment</h6>
 					<span class="text-success">
-						<!-- <i class="fab fa-lg fa-cc-visa"></i> -->
-					    {{order.payment_method}}  
+					    {{ord.order.payment_method}}  
 					</span>
-					<!-- <p>Subtotal: $356 <br>
-					 Shipping fee:  $56 <br> 
-					 <span class="b">Total:  $456 </span> -->
-					<!-- </p> -->
 				</div>
-				{% if order.delivery_status != 'cancelled' %}
+				<div class="col-md-3" style="margin-top: 20px;">
+					<h6 class="text-muted">Delivery to</h6>
+					<p> 
+					{{ord.order.delivered_address}}
+			 		</p>
+				</div>
+				<div class="col-md-3" style="margin-top: 20px;">
+					<h6 class="text-muted">Delivery Status</h6>
+					    {{ord.order.delivery_status}}  
+				</div> 
+				
+				
+				{% if ord.order.delivery_status != 'cancelled' %}
 
-				<a href="{% url 'cancel_order_user' order.id %}" class="btn btn-primary" style="height: fit-content; margin: 15px;">Cancel</a>
+				<a href="{% url 'cancel_order_user' ord.order.id %}" class="btn btn-primary" style="height: fit-content; margin: 15px; margin-left: auto;">Cancel</a>
 
 				{% endif %}
-				<div class="col-md-4" style="margin-top: 10px;">
-					<h6 class="text-muted">Delivery Status</h6>
-					    {{order.delivery_status}}  
-				</div>
 			</div> <!-- row.// -->
 		</div> <!-- card-body .// -->
 		<div class="table-responsive">
 		<table class="table table-hover">
 			<tr>
-				<!-- <td width="65">
-					<img src="../images/items/1.jpg" class="img-xs border">
-				</td> -->
-				<!-- <td> 
-					<p class="title mb-0">{{order.products.product_name}}</p>
-					<var class="price text-muted">{{product.product_discount_price}}</var>
-				</td> -->
 				<td> Seller <br> E-kart Logistics </td>
 				<!-- <td width="250"> <a href="#" class="btn btn-outline-primary">Track order</a> <a href="#" class="btn btn-light"> Details </a> </td> -->
 			</tr>
@@ -85,7 +87,7 @@
 		{% endfor %}
 	</main>
 </div> <!-- row.// -->
-</div>
+<!-- </div> -->
 
 
 </section>

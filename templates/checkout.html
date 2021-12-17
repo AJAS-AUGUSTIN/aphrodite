@@ -3,25 +3,17 @@
 {% load static %}
 
 {% block content %}
-<!-- ============================ COMPONENT 1 ================================= -->
+<!-- ============================ COMPONENT 1 ================================= -->	
 <div class="row">
 	<aside class="col-lg-6">
 <a href="{% url 'add_address_checkout' %}" class="btn btn-dark" style="margin-left: 5%; margin-top: 5%;">Add Address</a>
 
-<form action="{% url 'place_order' %}" method="post">
+<form action="{% url 'place_order' %}" method="post" id="checkout_form">
 {% csrf_token %}
 <div style="outline: 2px dashed black; margin-left: 10px;margin-top: 10px;">
 	{% for add in address %}
 	<div class="container">
 	<div class="ex1">
-
-		<!-- <select class="form-select" aria-label="Default select example">
-			<option selected>Select Address</option>
-			<option value="1">One</option>
-			<option value="2">Two</option>
-			<option value="3">Three</option>
-		  </select> -->
-
 		<input class="form-check-input" type="radio"  name="address" id="address" style="margin-left: 10px;" value="{{add.id}}">
 		<label class="form-check-label" for="flexRadioDefault1"  style="margin-left: 50px;">
 			<a href="{% url 'editaddress_checkout' id=add.id %}" class="btn btn-primary " style="margin-left: 750px;" >Edit</a>
@@ -29,11 +21,8 @@
 			<p>{{add.address_line_1}}</p>
 			<p>{{add.address_line_2}}</p>
 			<p>{{add.phone}}</p>
-			<!-- <p>{{add.email}}</p> -->
 			<p>{{add.phone_number}}</p>
 			<p>{{add.city}}</p>
-			<!-- <p>{{add.state}}</p>
-			<p>{{add.country}}</p> -->
 			<p>{{add.pincode}}</p>
 		</label>
 	  </div>
@@ -42,20 +31,27 @@
 </div>
 <div class="form-check p-5">
 	<h2>Payment</h2>
-	<input style="margin-left: 10px;" class="form-check-input" type="checkbox" name="cash" id="cash" value="cash on delivery" >
-	<button class="btn btn-primary" name="cash" value="cash on delivery" style="width: 88%;margin-bottom: 3%;"><label style="margin-left: 30px;" class="form-check-label" for="flexRadioDefault1">
-	  Cash on Delivery
-	</label></button>
+	<div class="form-check">
+		<input class="form-check-input" type="radio" value="cash_on_delivery" name="payment_method" id="flexRadioDefault1" checked>
+		<label class="form-check-label" for="flexRadioDefault1">
+		  Cash on delivery (COD)
+		</label>
+	  </div>
+	  <div class="form-check" style="display: none;">
+		<input class="form-check-input" type="radio" value="razor_pay" name="payment_method" id="flexRadioDefault2">
+		<label class="form-check-label" for="flexRadioDefault2">
+		  Razor Pay
+		</label>
+	  </div>
 
 	<div id="paypal-button-container"></div>
 
     <!-- Include the PayPal JavaScript SDK -->
     <script src="https://www.paypal.com/sdk/js?client-id=test&currency=USD"></script>
 
-	<!-- razorpay
-	<input type="hidden" custom="Hidden Element" name="hidden">
-	
-	<script src="https://checkout.razorpay.com/v1/checkout.js"></script> -->
+		<!-- Payment Button -->
+		<button type="button" style="width: 88%;" class="btn btn-primary" onclick="rayzor_pay_details()" id="rzp-button1">Razor Pay</button>
+		<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 
 </div>
 
@@ -93,22 +89,44 @@
 					<td> 
 						<div class="price-wrap"> 
 							<var class="price">₹{{ cart_item.sub_total }}</var> 
-							<small class="text-muted">₹{{cart_item.product.product_discount_price}}</small> 
+							<!-- <small class="text-muted">₹{{cart_item.product.product_discount_price}}</small>  -->
 						</div> <!-- price-wrap .// -->
 					</td>
 				</tr>
 				{% endfor %}
 				</tbody>
 				</table>
+				<div>
+					<h5 style="margin-left: 30px">Tax : ₹{{tax}}</h5><br>
+					<h5 style="margin-left: 30px">Grand Total : ₹{{grand_total}}</h5><br>
+				</div>
 			<button type="submit" value="submit" class="btn btn-dark btn-block">Place Order</button>
 			<a href="{% url 'home' %}" class="btn btn-light btn-block">Continue Shopping</a>
-			<!-- <input type="submit" value="Submit"> -->
+			<input type="hidden" value="{{grand_total}}" id="hidden_grand_total" name="hidden_grand_total">
+			 
+			<!-- payment id -->
+
+			 <input type="hidden" name="payment_id" id="payment_id_generated">
+</form>
+<form  action="{% url 'apply_coupon' %}" method="POST" >
+	{% csrf_token %}
+<div class="form-group" style="margin-top: 10px;">
+	<label for="exampleInputEmail1">Apply coupon code</label>
+	<input type="text" class="form-control" name="coupon" value="" aria-describedby="CouponHelp" style="text-transform: uppercase;" placeholder="Enter coupon code">
+	<button type="submit" value="submit" style="margin-top: 10px;" class="btn btn-dark">Apply</button>
+	<div>
+		{% for message in messages %}
+		<p style="color: chartreuse;">{{message}}</p>
+		{% endfor %}
+	</div>
+	</div>
 </form>
 		</div> <!-- card-body.// -->
 		</div> <!-- card.// -->
 
 </aside> <!-- col.// -->
 
+<!-- razorpay -->
 </div> <!-- row.// -->
 
 <!-- ============================ COMPONENT 1 END .// ================================= -->
@@ -221,6 +239,110 @@ function uuidv4() {
 
 </script>
 
+<!-- razor pay  -->
+
+
+<script>
+
+	function rayzor_pay_details(){
+	
+	var grand_total = document.getElementById('hidden_grand_total').value
+	
+	
+	
+	  var data = {	
+		'total_amount' : grand_total,
+		'csrf_token' : '{{csrf_token}}',
+	
+	  }
+	
+	  if (document.getElementById('address') === null){
+	
+		Swal.fire('Add Address')
+	
+	  return false;
+	}
+	
+	else
+	
+	{
+	  $.ajax({
+		url:"{% url 'razor_pay_details' %}",
+		type:"POST",
+		data: data,
+		success: function(response){
+	
+		var grand_total = response.grand_total
+		var razor_pay_order_id = response.razor_pay_order_id
+		var currency = response.currency 
+		
+		
+		razor_function(grand_total, currency, razor_pay_order_id)
+		
+	
+		
+		}
+		})
+	
+	  return true;
+	
+	}
+	
+	
+	  
+	
+	
+	}
+	
+	
+	
+	</script>
+	
+	
+	<!-- razor pay function -->
+	
+	<script>
+	  function razor_function(grand_total, currency, razor_pay_order_id){
+	
+	
+		var options = {
+		  "key": 'rzp_test_EBo2ZDIjBvXvjr', // Enter the Key ID generated from the Dashboard
+		  "amount": grand_total, // Amount is in currency subunits. Default currency is INR. Hence, 50000 refers to 50000 paise
+		  "currency": currency,
+		  "name": "WatchKart",
+		  "description": "Test Transaction",
+		  "order_id": razor_pay_order_id, //This is a sample Order ID. Pass the `id` obtained in the response of Step 2
+		  "handler": function (response){
+	
+				document.getElementById("payment_id_generated").value = razor_pay_order_id;
+				document.getElementById("flexRadioDefault2").checked = true;
+				$('#checkout_form').submit()
+		  },
+	
+	  };
+	  var rzp1 = new Razorpay(options);
+	  rzp1.on('payment.failed', function (response){
+		window.location.href = error_redirecting_url;
+	
+	  });
+	  document.getElementById('rzp-button1').onclick = function(e){
+	
+	
+	
+	  }
+	  rzp1.open();
+	  e.preventDefault();
+	
+	
+	
+	  }
+	  </script>
+
+
+
+
+
+
 
 <!-- <script>
 	function razor_function(grand_total,currency,order_id){
@@ -256,6 +378,7 @@ function uuidv4() {
 
 </script> -->
 
+<!-- <input type="hidden" custom="Hidden Element" name="hidden"> -->
 
  <style>
 	 div.ex1 {
