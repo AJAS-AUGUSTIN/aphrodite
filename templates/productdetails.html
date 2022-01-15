@@ -1,220 +1,173 @@
-
-<style>
-    * {box-sizing: border-box;}
-    
-    .img-zoom-container {
-      position: relative;
-    }
-    #myresult{
-      border: none;
-      margin-top: 50px;
-    }
-    
-    
-    .img-zoom-lens {
-      position: absolute;
-      border: 1px solid #d4d4d4;
-      /*set the size of the lens:*/
-      width: 40px;
-      height: 40px;
-    }
-    
-    .img-zoom-result {
-      border: 1px solid #d4d4d4;
-      /*set the size of the result div:*/
-      width: 300px;
-      height: 300px;
-    }
-    </style>
-    <script>
-    function imageZoom(imgID, resultID) {
-      var img, lens, result, cx, cy;
-      img = document.getElementById(imgID);
-      result = document.getElementById(resultID);
-      /*create lens:*/
-      lens = document.createElement("DIV");
-      lens.setAttribute("class", "img-zoom-lens");
-      /*insert lens:*/
-      img.parentElement.insertBefore(lens, img);
-      /*calculate the ratio between result DIV and lens:*/
-      cx = result.offsetWidth / lens.offsetWidth;
-      cy = result.offsetHeight / lens.offsetHeight;
-      /*set background properties for the result DIV:*/
-      result.style.backgroundImage = "url('" + img.src + "')";
-      result.style.backgroundSize = (img.width * cx) + "px " + (img.height * cy) + "px";
-      /*execute a function when someone moves the cursor over the image, or the lens:*/
-      lens.addEventListener("mousemove", moveLens);
-      img.addEventListener("mousemove", moveLens);
-      /*and also for touch screens:*/
-      lens.addEventListener("touchmove", moveLens);
-      img.addEventListener("touchmove", moveLens);
-      function moveLens(e) {
-        var pos, x, y;
-        /*prevent any other actions that may occur when moving over the image:*/
-        e.preventDefault();
-        /*get the cursor's x and y positions:*/
-        pos = getCursorPos(e);
-        /*calculate the position of the lens:*/
-        x = pos.x - (lens.offsetWidth / 2);
-        y = pos.y - (lens.offsetHeight / 2);
-        /*prevent the lens from being positioned outside the image:*/
-        if (x > img.width - lens.offsetWidth) {x = img.width - lens.offsetWidth;}
-        if (x < 0) {x = 0;}
-        if (y > img.height - lens.offsetHeight) {y = img.height - lens.offsetHeight;}
-        if (y < 0) {y = 0;}
-        /*set the position of the lens:*/
-        lens.style.left = x + "px";
-        lens.style.top = y + "px";
-        /*display what the lens "sees":*/
-        result.style.backgroundPosition = "-" + (x * cx) + "px -" + (y * cy) + "px";
-      }
-      function getCursorPos(e) {
-        var a, x = 0, y = 0;
-        e = e || window.event;
-        /*get the x and y positions of the image:*/
-        a = img.getBoundingClientRect();
-        /*calculate the cursor's x and y coordinates, relative to the image:*/
-        x = e.pageX - a.left;
-        y = e.pageY - a.top;
-        /*consider any page scrolling:*/
-        x = x - window.pageXOffset;
-        y = y - window.pageYOffset;
-        return {x : x, y : y};
-      }
-    }
-    </script>
-
 {% extends 'base.html' %}
 
 {% load static %}
 
 {% block content %}
 
-<header>
-  <header>
-    <script type="text/javascript">
-      var user = '{{request.user}}'
-    
-      function getToken(name) {
-      let cookieValue = null;
-      if (document.cookie && document.cookie !== '') {
-        const cookies = document.cookie.split(';');
-        for (let i = 0; i < cookies.length; i++) {
-          const cookie = cookies[i].trim();
-          // Does this cookie string begin with the name we want?
-          if (cookie.substring(0, name.length + 1) === (name + '=')) {
-            cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-            break;
-          }
-        }
-      }
-      return cookieValue;
-    }
-    const csrftoken = getToken('csrftoken');
-    </script>
-  </header>
-  
-</header>
-<!-- ============================ COMPONENT 1 ================================= -->
-{% for product in products %}
+
+<section class="section-content padding-y bg">
+	<div class="container">
+	
+	<!-- ============================ COMPONENT 1 ================================= -->
 <div class="card">
 	<div class="row no-gutters">
 		<aside class="col-md-6">
-<article class="gallery-wrap"> 
-	<div class="img-big-wrap">
-        <div class="img-zoom-container" style="display: flex; margin-left: 150px;">
-            <img id="myimage" src="{{product.image1.url}}" width="300" height="240" alt="Watch Photo">
-            <div id="myresult" class="img-zoom-result" ></div>
-          </div>
-	   <!-- <a href="#"><img src="{{product.image1.url}}"></a> -->
-	</div> <!-- img-big-wrap.// -->
-	
-</article> <!-- gallery-wrap .end// -->
-		</aside>
-		<main class="col-md-6 border-left">
-<article class="content-body">
+			<div class="exzoom" id="exzoom">
+				<!-- Images -->
+				<div class="exzoom_img_box">
+				  <ul class='exzoom_img_ul'>
+					<li><img src="{{product.image1.url}}"/></li>
+					<li><img src="{{product.image2.url}}"/></li>
+					<li><img src="{{product.image3.url}}"/></li>
+					<li><img src="{{product.image4.url}}"/></li>
+				  </ul>
+				</div>
+				<!-- <a href="https://www.jqueryscript.net/tags.php?/Thumbnail/">Thumbnail</a> Nav -->
+				<div class="exzoom_nav"></div>
+				<!-- Nav Buttons -->
+				<p class="exzoom_btn">
+					<a href="javascript:void(0);" class="exzoom_prev_btn"> < </a>
+					<a href="javascript:void(0);" class="exzoom_next_btn"> > </a>
+				</p>
+			  </div>
+			  
 
-<h2 class="title">{{product.brand}} {{product.product_name}}</h2>
-
-<div class="mb-3"> 
-	<var class="price h4">₹{{product.product_discount_price}}</var>
-  <!-- <del><var class="price h6">₹{{product.product_max_price}}</var></del> -->
-  {% if product.offer_name != None %}
-					<p style="color: yellowgreen;">{{product.offer_percent}}% offer</p> <!-- price-wrap.// -->
-	{% endif %}
-</div> 
-
-<p>{{product.product_description}}</p>
-<p>{{product.product_long_description}}</p>
-<!-- <button href="" data-product="{{product.id}}" data-action="add" class="btn btn-outline-secondary add-btn update-cart">Add to Cart</button> -->
-{% if product.stock <= 0 %}
-<h5 style="color: red;">Out of stock</h5>
-{% else %}
-  {% if in_cart %}
-	<a href="" class="btn  btn-sucess" > <span class="text">Added to cart</span> <i class="fas fa-check"></i>  </a>
-
-  {% else %}
-	<a href="{% url 'add_cart' product.id %}" class="btn  btn-dark" > <span class="text">Add to cart</span> <i class="fas fa-shopping-cart"></i>  </a>
-  {% endif %}
-{% endif %}
-</article> <!-- product-info-aside .// -->
-		</main> <!-- col.// -->
-	</div> <!-- row.// -->
-</div> <!-- card.// -->
-{% endfor %}
-<!-- ============================ COMPONENT 1 END .// ================================= -->
-
-<br>
-
-<!-- <div class="row">
-			<div class="col-md-9">
-
-	<header class="section-heading">
-		<h3>Customer Reviews </h3>  
 		
-	</header>
-
-	<article class="box mb-3">
-		<div class="icontext w-100">
-			<img src="./images/avatars/avatar1.jpg" class="img-xs icon rounded-circle">
-			<div class="text">
-				<span class="date text-muted float-md-right">24.04.2020 </span>  
-				<h6 class="mb-1">Mike John </h6>
-				
-			</div>
-		</div>       -->
-
-
-        <!-- icontext.// -->
-
-
-
-		<!-- <div class="mt-3">
-			<p>
-				Dummy comment Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod
-				tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,
-				quis nostrud exercitation ullamco laboris nisi ut aliquip
-			</p>	
-		</div>
-	</article> -->
+		</aside>
+        <main class="col-md-6 border-left">
+          <article class="content-body">
+          <!-- <a id="hmAddtoWishlistBtn" onclick="wishList('{{product.id}}')"> <i class="fa fa-heart" style="color: red;" ></i></a> -->
+		  <a id="wishicon1" onclick="wishList('{{product.id}}')"> <button class="btn" style="color: black;text-shadow: 0 0 3px #000;">Add to wishlist</button></a>	
+          <h2 class="title">{{product.brand}} {{product.product_name}}</h2>
+          
+          
+          <div class="mb-3"> 
+            <var class="price h4">₹{{product.product_discount_price}}</var>
+            <!-- <del><var class="price h6">₹{{product.product_max_price}}</var></del> -->
+            {% if product.offer_name != None %}
+                    <p style="color: yellowgreen;">{{product.offer_percent}}% offer</p> <!-- price-wrap.// -->
+            {% endif %}
+          </div> 
+          
+          <p>{{product.product_description}}</p>
+          <p>{{product.product_long_description}}</p>
+          <!-- <button href="" data-product="{{product.id}}" data-action="add" class="btn btn-outline-secondary add-btn update-cart">Add to Cart</button> -->
+          {% if product.stock <= 0 %}
+          <h5 style="color: red;">Out of stock</h5>
+          {% else %}
+            {% if in_cart %}
+            <a class="btn  btn-success" > <span style="color: white;" class="text">Added to cart</span> <i style="color: white;" class="fas fa-check"></i>  </a>
+            <a href="{% url 'cart' %}" class="btn  btn-dark" > <span class="text">View cart</span> <i class="fas fa-eye"></i>  </a>
+            {% else %}
+            <a onclick="add_cart('{{product.id}}')"  style="width: -moz-available; margin-top:10px "  class="btn  btn-dark" > <span style="color: white;" class="text">Add to cart</span> <i style="color: white;" class="fas fa-shopping-cart"></i>  </a>
+            {% endif %}
+          {% endif %}
+          </article> <!-- product-info-aside .// -->
 
 	
+			</main> <!-- col.// -->
+		</div> <!-- row.// -->
+	</div> <!-- card.// -->
+	<!-- ============================ COMPONENT 1 END .// ================================= -->
+	
 
-	<!-- </div> col.// -->
-<!-- </div> row.// -->
-
-
-<!-- </div>  container .// 
-</section> -->
+	
+	<br>
+</div> <!-- container .//  -->
+	</section>
 <!-- ========================= SECTION CONTENT END// ========================= -->
+
 <script>
-    imageZoom("myimage", "myresult");
-    </script>
-    
-</body>
-</html>
-<script src="{% static 'js/cart.js' %}" type="text/javascript"></script>
+
+    function add_cart(id){        
+        var data  = {'id': id,  "csrf_token": '{{csrf_token}}'} 
+        $.ajax({
+            url : "{% url 'add_cart'  %}",
+            method: "POST",
+            data : data,
+            success : function(data){
+                let msg = data.success
+				let mess = data.alert
+                let quantity = data.cart_count
+                let max = data.max
+				let error = data.error
+				if(msg){
+					document.getElementById('cartCount').innerText = quantity
+					swal("Item added to Cart",
+					{
+					icon:"success",
+					});
+                    document.getElementById('cartCount').innerText = quantity   
+					// $("#cart_icon").load(window.location + "#cart_icon");
+				}
+				else if(mess){
+					swal({
+						title:"Already in Cart",
+						text:"Added the quantity",
+      					icon: "info",
+   						 });
+				}
+				else if(max){
+					swal({
+						title:"Already in Cart",
+						text:"Maximum quantity reached",
+      					icon: "info",
+   						 });
+				}
+				else if(error){
+					swal({
+						title:"No stock",
+						text:"",
+      					icon: "error",
+   						 });
+				}
+				
+            }
+        })
+    }
+
+</script>
+
+<script>
+
+    function wishList(id){        
+        var data  = {'id': id,  "csrf_token": '{{csrf_token}}'} 
+        $.ajax({
+            url : "{% url 'add_wishlist'  %}",
+            method: "POST",
+            data : data,
+            success : function(data){
+                
+                let msg = data.success
+				let mess = data.alert
+                let quantity = data.wish_items
+                let errorMsg = data.error
+				if(mess){
+					swal("Already in Wishlist", {
+      					icon: "info",
+   						 });
+				}
+                else if(msg && quantity ){
+                    document.getElementById('wishCount').innerText = quantity   
+                    swal("Product added to wishlist", {
+      					icon: "success",
+   						 });
+                }else{
+                    swal("You must be logged in to add to wishlist", {
+      				icon: "error",
+   					 });
+                }
+                
+            }
+        })
+    }
+
+</script>
+
+
+
+
+  
 {% endblock %}
 
 
- 

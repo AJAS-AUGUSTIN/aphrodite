@@ -6,12 +6,14 @@ from django.dispatch import receiver
 from django.db.models.signals import post_save
 from django.shortcuts import render
 from django.urls import reverse
-# from django.db.models.enums import Choices
-
 from accounts.models import Account
 import category
 
 # Create your models here.
+
+class Brand(models.Model):
+    name = models.CharField(max_length=200,unique=True)
+    
 class Offer(models.Model):
     offer_name      = models.CharField(max_length=100,null=True,unique=True)
     offer_percent   = models.IntegerField()
@@ -53,7 +55,7 @@ class Products(models.Model):
     product_name             = models.CharField(max_length=200,unique=True)
     url_slug                 = models.CharField(max_length=100,unique=True)
     brand                    = models.CharField(max_length=200)
-    product_max_price        = models.CharField(max_length=255)
+    product_max_price        = models.IntegerField()
     product_discount_price   = models.IntegerField()
     product_new_price        = models.IntegerField(null=True)
     product_description      = models.TextField(max_length=500)
@@ -104,88 +106,3 @@ class Coupon(models.Model):
 class ExpiredCoupon(models.Model):
     coupon = models.ForeignKey(Coupon,on_delete=models.CASCADE,blank=True)
     user   = models.ForeignKey(Account,on_delete=models.CASCADE,blank=True)
-
-
-# class AppliedOffer(models.Model):
-#     offer = models.ForeignKey(Offer,on_delete=models.CASCADE)
-#     category = models.ForeignKey(Categories,on_delete=models.CASCADE)
-#     products = models.ForeignKey(Products,on_delete=models.CASCADE)
-
-# class ProductMedia(models.Model):
-#     id             = models.AutoField(primary_key=True)
-#     product_id     = models.ForeignKey(Products, on_delete=models.CASCADE)
-#     media_type_choice = ((1,"Image"),(2,"Video"))
-#     media_type     = models.CharField(max_length=255)
-#     media_content  = models.FileField()
-#     created_at     = models.DateTimeField(auto_now_add=True)
-#     is_active      = models.IntegerField(default=1)
-
-# class ProductTransaction(models.Model):
-#     id             = models.AutoField(primary_key=True)
-#     product_id     = models.ForeignKey(Products, on_delete=models.CASCADE)
-#     transaction_type_choices = ((1,"BUY"),(2,"SELL"))
-#     transaction_product_count = models.IntegerField(default=1)
-#     transaction_type = models.Choices(Choices = transaction_type_choices, max_length = 255)
-#     transaction_description = models.CharField(max_length=255)
-#     created_at     = models.DateTimeField(auto_now_add=True)
-
-# class ProductDetails(models.Model):
-#     id            = models.AutoField(primary_key=True)
-#     product_id    = models.ForeignKey(Products, on_delete=models.CASCADE)
-#     title         = models.CharField(max_length=255)
-#     title_details = models.CharField(max_length=255)
-#     created_at    = models.DateTimeField(auto_now_add=True)  
-#     is_active     = models.IntegerField(default=1)
-
-# class ProductAbout(models.Model):
-#     id            = models.AutoField(primary_key=True)
-#     product_id    = models.ForeignKey(Products, on_delete=models.CASCADE)
-#     title         = models.CharField(max_length=255)
-#     created_at    = models.DateTimeField(auto_now_add=True)  
-#     is_active     = models.IntegerField(default=1)
-
-# class ProductTags(models.Model):
-#     id            = models.AutoField(primary_key=True)
-#     product_id    = models.ForeignKey(Products, on_delete=models.CASCADE)
-#     title         = models.CharField(max_length=255)
-#     created_at    = models.DateTimeField(auto_now_add=True)  
-#     is_active     = models.IntegerField(default=1)
-
-# class ProductQuestions(models.Model):
-#     id            = models.AutoField(primary_key=True)
-#     product_id    = models.ForeignKey(Products, on_delete=models.CASCADE)
-#     user_id       = models.ForeignKey(Account, on_delete=models.CASCADE)
-#     question      = models.TextField(max_length=255)
-#     answer        = models.TextField(max_length=255)
-#     created_at    = models.DateTimeField(auto_now_add=True)  
-#     is_active     = models.IntegerField(default=1)
-
-# class ProductReviews(models.Model):
-#     id            = models.AutoField(primary_key=True)
-#     product_id    = models.ForeignKey(Products, on_delete=models.CASCADE)
-#     user_id       = models.ForeignKey(Account, on_delete=models.CASCADE)
-#     review_images = models.FileField()
-#     rating        = models.CharField(default='5')
-#     review        = models.TextField(default='')
-#     created_at    = models.DateTimeField(auto_now_add=True)  
-#     is_active     = models.IntegerField(default=1)
-
-# class ProductReviewVoting(models.Model):
-#     id            = models.AutoField(primary_key=True)
-#     product_review_id    = models.ForeignKey(Products, on_delete=models.CASCADE)
-#     user_id_voting      = models.ForeignKey(Account, on_delete=models.CASCADE)
-#     created_at    = models.DateTimeField(auto_now_add=True)  
-#     is_active     = models.IntegerField(default=1)  
-
-# class ProductVarient(models.Model):
-#     id      = models.AutoField(primary_key=True)
-#     title   = models.CharField(max_length=255)
-#     created_at = models.DateTimeField(auto_now_add=True)
-
-# class ProductVarientItems(models.Model):
-#     id      = models.AutoField(primary_key=True)
-#     product_id = models.ForeignKey(Products, on_delete=models.CASCADE)
-#     product_varient_id = models.ForeignKey(ProductVarient, on_delete=models.CASCADE)
-#     title   = models.CharField(max_length=255)
-#     created_at = models.DateTimeField(auto_now_add=True)
-

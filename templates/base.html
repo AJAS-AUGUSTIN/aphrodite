@@ -51,6 +51,44 @@ $(document).ready(function() {
 // jquery end
 </script>
 
+<!-- ajax -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script src="jquery-3.5.1.min.js"></script>
+
+<!-- zoom -->
+
+<link href="{% static 'css/jquery.exzoom.css' %}" rel="stylesheet">
+<script src="https://code.jquery.com/jquery-1.12.4.min.js" 
+        integrity="sha384-nvAa0+6Qg9clwYCGGPpDQLVpLNn0fRaROjHqs13t4Ggj3Ez50XnGQqc/r8MhnRDZ" 
+        crossorigin="anonymous"></script>
+<script src="{% static 'js/jquery.exzoom.js' %}"></script>
+
+
+
+<script>
+	$(function(){
+	
+		$("#exzoom").exzoom({
+	  
+		  // thumbnail nav options
+		  "navWidth": 60,
+		  "navHeight": 60,
+		  "navItemNum": 5,
+		  "navItemMargin": 7,
+		  "navBorder": 1,
+	  
+		  // autoplay
+		  "autoPlay": true,
+	  
+		  // autoplay interval in milliseconds
+		  "autoPlayTimeout": 2000
+		  
+		});
+	  
+	  });
+	</script>
+
+
 </head>
 <body>
 

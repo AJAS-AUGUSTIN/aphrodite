@@ -20,16 +20,13 @@ urlpatterns = [
     path('view_offer/',views.view_offer,name='view_offer'),
     path('edit_offer/<int:id>',views.edit_offer,name='edit_offer'),
     path('delete_offer/<int:id>',views.delete_offer,name='delete_offer'),
-
     path('add_category_offer/',views.add_category_offer,name='add_category_offer'),
     path('delete_category_offer/<int:id>',views.delete_category_offer,name='delete_category_offer'),
-
     path('add_product_offer/',views.add_product_offer,name='add_product_offer'),
-
     path('add_coupon/',views.add_coupon,name='add_coupon'),
     path('view_coupon/',views.view_coupon,name='view_coupon'),
     path('apply_coupon/',views.apply_coupon,name='apply_coupon'),
-    
-
+    path('add_brand/',views.add_brand,name='add_brand'),
+    path('view_brand/',views.view_brand,name='view_brand'),
 
 ]

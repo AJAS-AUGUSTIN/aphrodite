@@ -2,22 +2,24 @@ from django.http import request
 from django.shortcuts import render, redirect
 from accounts.models import Account
 import category
-from category.models import Address, Categories, Coupon, Offer, Products, SubCategories
+from category.models import Address, Brand, Categories, Coupon, ExpiredCoupon, Offer, Products, SubCategories
 from django.contrib import messages
 from django.core.files.base import ContentFile
 import base64
 from carts.models import CartItems,Cart
 from django.contrib import messages
+from carts.views import _cart_id
 # Create your views here.
+
 
 def addproduct(request):
     categories = Categories.objects.all()
     subcategories = SubCategories.objects.all()
+    brand = Brand.objects.all()
     if request.method == 'POST':
         product_name = request.POST['product_name']
         if Products.objects.filter(product_name=product_name):
-             messages.error(
-                request, "product already exists pls choose edit option")
+             messages.error(request, "product already exists pls choose edit option")
              return redirect(addproduct)
         slug = product_name.replace(" ", "-").lower()
         brand = request.POST['brand']
@@ -28,11 +30,9 @@ def addproduct(request):
         category_id = request.POST.get('Category')
         prod_instance = Categories.objects.get(id=category_id)
         SubCategories_id = request.POST['SubCategory']
-        # image1=request.FILES.get('image1')
-        
-        #for cropping
+        product_instance =SubCategories.objects.get(id =SubCategories_id)
+        # #for cropping
         image1 = request.POST.get('pro_img1')
-        print("hiiiiiiiiii",image1)
         image2 = request.POST.get('pro_img2')
         image3 = request.POST.get('pro_img3')
         image4 = request.POST.get('pro_img4')
@@ -54,13 +54,18 @@ def addproduct(request):
         ext = format.split('/')[-1]
         product_image4 = ContentFile(base64.b64decode(img4), name= product_name + '4.' + ext)
         
+        try:
+            Products.objects.create(product_name=product_name,url_slug=slug,brand=brand,stock=stock,product_max_price=product_max_price,product_discount_price=product_discount_price,product_description=product_description,SubCategories_id=product_instance,category=prod_instance,image1=product_image1,image2=product_image2,image3=product_image3,image4=product_image4)
+            messages.success(request, "Product Added")
+        except:
+            messages.warning(request, "Not Added")
 
-
-        product_instance =SubCategories.objects.get(id =SubCategories_id)
-        Products.objects.create(product_name=product_name,url_slug=slug,brand=brand,stock=stock,product_max_price=product_max_price,product_discount_price=product_discount_price,product_description=product_description,SubCategories_id=product_instance,category=prod_instance,image1=product_image1,image2=product_image2,image3=product_image3,image4=product_image4)
         return redirect(addproduct)
+    else:
+        pass
         
     return render(request, 'addproducts.html',{'subcategories':subcategories,'categories':categories})
+
 
 def Category(request):
     if request.method == 'POST':
@@ -76,6 +81,7 @@ def Category(request):
         return redirect(Category)
     else:
         return render(request, 'addcategory.html')  
+
 
 def SubCategory(request):
     categories = Categories.objects.all()
@@ -98,13 +104,16 @@ def categoryhome(request):
     categories = Categories.objects.all()
     return render(request, 'category.html',{'categories':categories})
 
+
 def subcategoryhome(request):
     subcategories = SubCategories.objects.all()
     return render(request, 'subcategoryhome.html',{'subcategories':subcategories})
 
+
 def productshome(request):
     products = Products.objects.all()
     return render(request, 'productshome.html',{'products':products})
+
 
 def delcategory(request, title):
     try:
@@ -115,6 +124,7 @@ def delcategory(request, title):
         messages.error(request, "The category not found")
     return redirect(categoryhome)
 
+
 def delsubcategory(request, title):
     try:
         subcategories = SubCategories.objects.get(title=title)
@@ -123,6 +133,7 @@ def delsubcategory(request, title):
     except:
         messages.error(request, "The category not found")
     return redirect(subcategoryhome)
+
 
 def delproduct(request, id):
     try:
@@ -165,9 +176,11 @@ def editsubcategory(request, title):
     else:
         return render(request, 'editsubcategory.html',{'subcategory':subcategories,'categories':categories})
 
+
 def editproduct(request, id):
     products = Products.objects.get(id=id)
     subcategories = SubCategories.objects.all()
+    categories = Categories.objects.all()
     if request.method == 'POST':
         product_name = request.POST['product_name']
         brand = request.POST['brand']
@@ -187,10 +200,19 @@ def editproduct(request, id):
             products.product_max_price = product_max_price
         if product_discount_price != '':
             products.product_discount_price = product_discount_price
+        if request.FILES.get('images1'):
+            products.image1 = request.FILES.get('images1')
+        if request.FILES.get('images2'):
+            products.image2 = request.FILES.get('images2')
+        if request.FILES.get('images3'):
+            products.image3 = request.FILES.get('images3')
+        if request.FILES.get('images4'):
+            products.image4 = request.FILES.get('images4')
             products.save()
             return redirect(productshome)
     else:
-        return render(request, 'editproducts.html',{'product':products,'subcategories':subcategories})
+        return render(request, 'editproducts.html',{'product':products,'subcategories':subcategories,'categories':categories})
+
 
 def add_address(request):
     current_user = request.user
@@ -212,21 +234,23 @@ def add_address(request):
     else:
         return render(request,'address.html')
 
+
 def add_offer(request):
     if request.method == 'POST':
         offer_name      = request.POST['offer_name']
         offer_percent   = request.POST['offer_percent']
         expiry_date     = request.POST['expiry_date']
         expiry_time     = request.POST['expiry_time']
-        
         offer = Offer.objects.create(offer_name=offer_name,offer_percent=offer_percent,expiry_date=expiry_date,expiry_time=expiry_time)
     else:
         return render(request,'add_offer.html')
     return render(request,'add_offer.html')
 
+
 def view_offer(request):
     offers = Offer.objects.all()
     return render(request,'view_offer.html',{'offers':offers})
+
 
 def edit_offer(request,id):
     offers = Offer.objects.get(id=id)
@@ -240,6 +264,7 @@ def edit_offer(request,id):
     else:
         return render(request,'edit_offer.html',{'offers':offers})
 
+
 def delete_offer(request,id):
     try:
         offers = Offer.objects.get(id=id)
@@ -249,6 +274,7 @@ def delete_offer(request,id):
         messages.error(request, "The offer not found")
     return redirect('view_offer')
     
+
 def add_category_offer(request):
     categories = Categories.objects.all()
     offers = Offer.objects.all()
@@ -261,14 +287,12 @@ def add_category_offer(request):
         category_id = request.POST['hidden_category_id']
         categories = Categories.objects.get(id = category_id)
         offer = request.POST.get('offer')
-        print(offer)
         try:
             if offer != 'none':
                 offers = Offer.objects.get(offer_name = offer)
                 offer_name = offers.offer_name
                 categories.offer_name = offer_name
                 categories.save()
-
                 products = Products.objects.filter(category = category_id)
                 for product in products:
                     product.offer_type = category_offer
@@ -283,8 +307,6 @@ def add_category_offer(request):
             else:
                 categories.offer_name = 'none'
                 categories.save()
-                
-                
                 products = Products.objects.filter(category = category_id)
                 for product in products:
                     product.offer_type = None
@@ -298,15 +320,11 @@ def add_category_offer(request):
                 return redirect('add_category_offer')
         except:
             return redirect('add_category_offer')
-
-        
     elif request.method == 'GET':
         return render(request,'add_category_offer.html',context)
 
+
 def delete_category_offer(request,id):
-    # category_id = request.POST.get('hidden_category_id')
-    # print(category_id)
-    # categories = Categories.objects.get(id = category_id)
     offers = Offer.objects.get(id = id)
     offers.delete()
     return render(request,'add_category_offer.html')
@@ -323,17 +341,31 @@ def add_product_offer(request):
     }
     if request.method == 'POST':
         product_id = request.POST['hidden_product_id']
-        print(product_id)
         offer = request.POST.get('offer')
-        print(offer)
         if offer != 'none':
             offers = Offer.objects.get(offer_name = offer)
             offer_name = offers.offer_name
 
             products = Products.objects.get(id = product_id)
-            print(products.offer_percent)
-            print(offers.offer_percent)
-            if products.offer_percent < offers.offer_percent:
+            try:
+                if products.offer_percent < offers.offer_percent:
+                    products.offer_type = "product_offer"
+                    products.offer_name = offers.offer_name           
+                    products.offer_percent = offers.offer_percent         
+                    products.expiry_date = offers.expiry_date         
+                    products.expiry_time = offers.expiry_time
+                    products.save()
+                    return redirect('add_product_offer')
+                else:
+                    category = Categories.objects.get(id = category_id)
+                    products.offer_type = "category offer"
+                    products.offer_name = category.offer_name         
+                    products.offer_percent = offers.offer_percent        
+                    products.expiry_date = offers.expiry_date
+                    products.expiry_time = offers.expiry_time
+                    products.save()
+                    return redirect('add_product_offer')
+            except:
                 products.offer_type = "product_offer"
                 products.offer_name = offers.offer_name           
                 products.offer_percent = offers.offer_percent         
@@ -341,22 +373,10 @@ def add_product_offer(request):
                 products.expiry_time = offers.expiry_time
                 products.save()
                 return redirect('add_product_offer')
-            else:
-                category = Categories.objects.get(id = category_id)
-                products.offer_type = "category offer"
-                products.offer_name = category.offer_name         
-                products.offer_percent = offers.offer_percent        
-                products.expiry_date = offers.expiry_date
-                products.expiry_time = offers.expiry_time
-                products.save()
-                return redirect('add_product_offer')
         else:                                       
             products = Products.objects.get(id = product_id)
             offer_name = products.category.offer_name
-            print(products)
-            print(offer_name)
             category = Categories.objects.get(id = category_id)
-            print(category.offer_name)
             try:
                 offer = Offer.objects.get(offer_name=category.offer_name)
                 if offer_name:
@@ -399,43 +419,82 @@ def view_coupon(request):
 def apply_coupon(request,total=0,tax=0,grand_total=0,quantity=0,cart_items=None):
     address = Address.objects.filter(user_id=request.user.id)
     if request.method == 'POST':
-        get_coupon = request.POST.get('coupon').upper()
-        get_coupon
-        print("get coupon",get_coupon)
-        coupon = Coupon.objects.get(coupon_name=get_coupon)
-        print("coupon percent",coupon.coupon_percent)
-        cart = Cart.objects.get(cart_id=request.user.username)
-        cart_items = CartItems.objects.filter(cart=cart, is_active=True)
-        if coupon:
-            print("coupon case")
-            for cart_item in cart_items:
-                total += (int(cart_item.product.product_discount_price) * int(cart_item.quantity))
-                print("total",total)
-                quantity += cart_item.quantity
-                tax = (2 * total)/100
-                grand_total = total + tax
-                print('grand total',grand_total)
-                grand_total = grand_total-(grand_total/coupon.coupon_percent)
-                messages.info(request, 'Your coupon has been applied!')
-                
-        else:
-            print('else caseeeeeeeeeee')
+        try:
+            get_coupon = request.POST.get('coupon').upper()
+            get_coupon
+            coupon = Coupon.objects.get(coupon_name=get_coupon)
+            try:
+                coup = ExpiredCoupon.objects.filter(coupon=coupon.id,user=request.user.id)
+            except:
+                pass
+            cart_items = CartItems.objects.filter(user=request.user, is_active=True)
+            if coup:
+                messages.info(request, 'Coupon Already Used!')
+                for cart_item in cart_items:
+                    total += (int(cart_item.product.product_discount_price) * int(cart_item.quantity))
+                    quantity += cart_item.quantity
+                    tax = (2 * total)/100
+                    grand_total = total + tax
+            elif coupon:
+                for cart_item in cart_items:
+                    total += (int(cart_item.product.product_discount_price) * int(cart_item.quantity))
+                    quantity += cart_item.quantity
+                    tax = (2 * total)/100
+                    grand_total = total + tax
+                    grand_total = grand_total-(grand_total/coupon.coupon_percent)
+                    messages.info(request, 'Your coupon has been applied!')
+                    ExpiredCoupon.objects.create(coupon=coupon,user=request.user)
+            else:
+                for cart_item in cart_items:
+                    total += (int(cart_item.product.product_discount_price) * int(cart_item.quantity))
+                    quantity += cart_item.quantity
+                    tax = (2 * total)/100
+                    grand_total = total + tax
+
+            context = {
+                    'total':total,
+                    'quantity':quantity,
+                    'cart_items':cart_items,
+                    'tax' : tax,
+                    'grand_total' : grand_total,
+                    'address':address
+                }
+            return render(request, 'checkout.html',context)
+        except:
+            messages.info(request, 'No such Coupon!!')
+            cart_items = CartItems.objects.filter(user=request.user, is_active=True)
             for cart_item in cart_items:
                 total += (int(cart_item.product.product_discount_price) * int(cart_item.quantity))
                 quantity += cart_item.quantity
                 tax = (2 * total)/100
                 grand_total = total + tax
 
-        context = {
-            'total':total,
-            'quantity':quantity,
-            'cart_items':cart_items,
-            'tax' : tax,
-            'grand_total' : grand_total,
-            'address':address
-        }
-        return render(request, 'checkout.html',context)
+            context = {
+                'total':total,
+                'quantity':quantity,
+                'cart_items':cart_items,
+                'tax' : tax,
+                'grand_total' : grand_total,
+                'address':address
+            }
+            return render(request, 'checkout.html',context)            
     else:
         return render(request, 'checkout.html')
+
+def add_brand(request):
+    if request.method == 'POST':
+        name = request.POST['brand_name']
+        if Brand.objects.filter(name=name):
+            messages.info(request, "Name already Exists")
+        else:
+            Brand.objects.create(name=name)
+            messages.info(request, "Brand Added")
+    else:
+        pass
+    return render(request, 'add_brand.html')
+
+def view_brand(request):
+    brand = Brand.objects.all()
+    return render(request, 'brand.html', {'brand':brand})
     
   

@@ -9,7 +9,35 @@
 <div class="container">
 
 <div class="intro-banner-wrap">
-	<img src="{% static 'images/banners/slider-img.png' %}" class="img-fluid rounded" style="margin-left: 100px;">
+	
+	<div class="intro-banner-wrap">
+        <div id="carouselExampleIndicators" class="carousel slide" data-ride="carousel">
+            <ol class="carousel-indicators">
+            {% for banner in banners %}
+              <li data-target="#carouselExampleIndicators" data-slide-to="{{forloop.counter0}}" {% if forloop.counter0 == 0 %}  class="active" {% endif %}></li>
+              {% endfor %}
+          
+            </ol>
+            
+            <div class="carousel-inner">
+            {% for banner in banners %}
+              <div class="carousel-item {% if forloop.counter0 == 0 %} active {% endif %}">
+                <a href="{% url 'store' %}"><img class="img-fluid rounded d-block w-100" src="{{banner.image1.url}}" alt=""></a>
+              </div>
+               {% endfor %}
+            </div>
+            <a class="carousel-control-prev" href="#carouselExampleIndicators" role="button" data-slide="prev">
+              <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+              <span class="sr-only">Previous</span>
+            </a>
+            <a class="carousel-control-next" href="#carouselExampleIndicators" role="button" data-slide="next">
+              <span class="carousel-control-next-icon" aria-hidden="true"></span>
+              <span class="sr-only">Next</span>
+            </a>
+          </div>
+        
+    </div>
+	
 </div>
 
 </div> <!-- container //  -->
@@ -54,15 +82,27 @@
 <div class="row">
 	{% for prd in product %}
 	<div class="col-md-3">
-		<div class="card card-product-grid" style="height: 410px;">
+		<div class="card card-product-grid" style="height: 450px;">
+			<!-- <div id="wishicon" >
+			{% if in_wishlist %}
+			<a style="margin-left: 90%;margin-top: 10px;" id="wishicon" onclick="wishList('{{prd.id}}')"> <i class="fa fa-heart" style="color: red;" ></i></a>
+			{% else %}
+			<a style="margin-left: 90%;margin-top: 10px;" id="wishicon1" onclick="wishList('{{prd.id}}')"> <i class="fa fa-heart" style="color: white;text-shadow: 0 0 3px #000;"></i></a>
+			{% endif %}
+			</div> -->
 			<a href="{% url 'productdetails' prd.id %}" class="img-wrap"> <img src="{{ prd.image1.url}}"> </a>
 			<figcaption class="info-wrap">
 				<div class="price mt-1">{{prd.brand}}</div>
 				<a href="{% url 'productdetails' prd.id %}" class="title">{{prd.product_name}}</a>
 				<div style="display: flex;" class="price mt-1">₹{{prd.product_discount_price}} <!-- price-wrap.// -->
+					{% if prd.product_new_price != None %}
+					<del class="price-old">₹{{prd.product_new_price}}</del>
+					{% else %}
+					{% endif %}
+
 				{% if prd.offer_name != None %}
 					{% if prd.stock != 0 %}
-						<p style="margin-left: 100px;color: yellowgreen;">{{prd.offer_percent}}% offer</p> <!-- price-wrap.// -->
+						<p style="margin-left: 80px;color: yellowgreen;">{{prd.offer_percent}}% offer</p> <!-- price-wrap.// -->
 					{% else %}
 					<p style="margin-left: 100px;color: yellowgreen;"></p> <!-- price-wrap.// -->
 					{% endif %}
@@ -70,17 +110,15 @@
 				</div>
 				{% if prd.stock <= 0 %}
                         <h5 style="color: red; margin-top:65px ">Out of stock</h5>
+                {% else %}
+                    {% if in_cart %}
+	                    <a href="" class="btn  btn-sucess" style="width:100%; margin-top:10px"  > <span class="text">Added to cart</span> <i class="fas fa-check"></i>  </a>
                     {% else %}
-                    {% if cart in_cart %}
-	                    <a href="" class="btn  btn-sucess" style="width: -moz-available; margin-top:10px"  > <span class="text">Added to cart</span> <i class="fas fa-check"></i>  </a>
-                    {% else %}
-	                    <a href="{% url 'add_cart' prd.id %}" style="width: -moz-available; margin-top:10px "  class="btn  btn-dark" > <span class="text">Add to cart</span> <i class="fas fa-shopping-cart"></i>  </a>
+	                    <a onclick="add_cart('{{prd.id}}')"  style="width:100%; margin-top:10px "  class="btn  btn-dark" > <span style="color: white;" class="text">Add to cart</span> <i style="color: white;" class="fas fa-shopping-cart"></i>  </a>
                     {% endif %}
-					<a href="{% url 'buy_now' prd.id %}" class="btn  btn-dark" style="width: -moz-available; margin-top: 10px;" > <span class="text">Buy Now</span> <i class="fas fa-buy"></i>  </a>
+					<a href="{% url 'buy_now' prd.id %}" class="btn  btn-dark" style="width: 100%; margin-top: 10px;" > <span class="text">Buy Now</span> <i class="fas fa-buy"></i>  </a>
                 {% endif %}
-				
-
-				<!-- <button data-product="{{product.id}}" data-action="add" class="btn btn-outline-secondary add-btn update-cart">Add to Cart</button> -->
+				<a id="wishicon1" onclick="wishList('{{prd.id}}')"> <button class="btn" style="color: black;text-shadow: 0 0 3px #000;">Add to wishlist</button></a>	
 			</figcaption>
 		</div>
 	</div> <!-- col.// -->
@@ -91,10 +129,93 @@
 </section>
 <!-- ========================= SECTION  END// ========================= -->
 
+<script>
 
+    function add_cart(id){        
+        var data  = {'id': id,  "csrf_token": '{{csrf_token}}'} 
+        $.ajax({
+            url : "{% url 'add_cart'  %}",
+            method: "POST",
+            data : data,
+            success : function(data){
+                let msg = data.success
+				let mess = data.alert
+                let quantity = data.cart_count
+                let max = data.max
+				let error = data.error
+				if(msg){
+					document.getElementById('cartCount').innerText = quantity
+					swal("Item added to Cart",
+					{
+					icon:"success",
+					});
+                    document.getElementById('cartCount').innerText = quantity   
+					// $("#cart_icon").load(window.location + "#cart_icon");
+				}
+				else if(mess){
+					swal({
+						title:"Already in Cart",
+						text:"Added the quantity",
+      					icon: "info",
+   						 });
+				}
+				else if(max){
+					swal({
+						title:"Already in Cart",
+						text:"Maximum quantity reached",
+      					icon: "info",
+   						 });
+				}
+				else if(error){
+					swal({
+						title:"No stock",
+						text:"",
+      					icon: "error",
+   						 });
+				}
+				
+            }
+        })
+    }
 
+</script>
 
+<script>
 
+    function wishList(id){        
+        var data  = {'id': id,  "csrf_token": '{{csrf_token}}'} 
+        $.ajax({
+            url : "{% url 'add_wishlist'  %}",
+            method: "POST",
+            data : data,
+            success : function(data){
+                
+                let msg = data.success
+				let mess = data.alert
+                let quantity = data.wish_items
+                let errorMsg = data.error
+				if(mess){
+					swal("Already in Wishlist", {
+      					icon: "info",
+   						 });
+				}
+                else if(msg && quantity ){
+                    document.getElementById('wishCount').innerText = quantity
+					swal("Product added to wishlist", {
+      					icon: "success",
+   						 });
+					// $( "#wishicon" ).load(window.location.href + " #wishicon" );
+                }else{
+                    swal("You must be logged in to add to wishlist", {
+      				icon: "error",
+   					 });
+                }
+                
+            }
+        })
+    }
+
+</script>
 
 </body>
 </html>

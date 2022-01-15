@@ -27,7 +27,7 @@
 
 		<article class="card">
 		<header class="card-header">
-			<strong class="d-inline-block mr-3">Order ID: {{ord.order.id}}</strong>
+			<strong class="d-inline-block mr-3">Order ID: {{ord.id}}</strong>
 			<!-- <span>Order Date: 16 December 2018</span> -->
 		</header>
 		<div class="card-body">
@@ -40,7 +40,7 @@
 				</div>
 				<div class="col-md-3">
 					<h6 class="text-muted">Product Name</h6>
-					<span class="text-success">
+					<span class="text">
 					    {{ord.products_id.product_name}}
 					</span>
 				</div>
@@ -52,7 +52,7 @@
 				</div>
 				<div class="col-md-3">
 					<h6 class="text-muted">Payment</h6>
-					<span class="text-success">
+					<span class="text">
 					    {{ord.order.payment_method}}  
 					</span>
 				</div>
@@ -64,14 +64,14 @@
 				</div>
 				<div class="col-md-3" style="margin-top: 20px;">
 					<h6 class="text-muted">Delivery Status</h6>
-					    {{ord.order.delivery_status}}  
+					    {{ord.delivery_status}}  
 				</div> 
 				
 				
-				{% if ord.order.delivery_status != 'cancelled' %}
+				{% if ord.delivery_status != 'cancelled' %}
 
-				<a href="{% url 'cancel_order_user' ord.order.id %}" class="btn btn-primary" style="height: fit-content; margin: 15px; margin-left: auto;">Cancel</a>
-
+				<a href="{% url 'cancel_order_user' ord.id %}" class="btn btn-primary" style="height: fit-content; margin: 15px; margin-left: auto;">Cancel</a>
+				
 				{% endif %}
 			</div> <!-- row.// -->
 		</div> <!-- card-body .// -->

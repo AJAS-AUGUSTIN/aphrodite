@@ -19,7 +19,6 @@ class Order(models.Model):
 
 class OrderItems(models.Model):
     order = models.ForeignKey(Order,on_delete=models.CASCADE,null=True)
-    # payment = models.ForeignKey(Payment,on_delete=models.SET_NULL,blank=True,null=True)
     user = models.ForeignKey(Account,on_delete=models.CASCADE,null=True)
     products_id = models.ForeignKey(Products,on_delete=models.CASCADE,null=True)
     quantity = models.IntegerField()
@@ -28,31 +27,12 @@ class OrderItems(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     grand_total = models.IntegerField(null=True)
+    delivery_status     = models.CharField(max_length = 50, blank = True) 
+
 
     def __str__(self):
-        return self.product.product_name
+        return self.products_id.product_name
 
-#class Order(models.Model):
-#     STATUS = (
-#         ('New','New'),
-#         ('Accepted','Accepted'),
-#         ('Completed','Completed'),
-#         ('Cancelled','Cancelled'),
-#     )
-#     order_id = models.CharField(max_length=50,blank=True)
-#     user = models.ForeignKey(Account,on_delete=models.SET_NULL,null=True)
-#     user_address = models.CharField(max_length=2500,null=True)
-#     payment_mode = models.CharField(max_length=100,null=True)
-#     order_number = models.CharField(max_length=20)
-#     grand_total = models.FloatField(null=True)
-#     tax = models.FloatField()
-#     status = models.CharField(max_length=10,choices=STATUS,default='New')
-#     is_orderd = models.BooleanField(default=False)
-#     created_at = models.DateTimeField(auto_now_add=True)
-#     updated_at = models.DateTimeField(auto_now=True)
-      
-#     def __str__(self):
-#         return self.first_name
         
 class Payment(models.Model):
     user = models.ForeignKey(Account,on_delete=models.CASCADE)

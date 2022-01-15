@@ -45,79 +45,6 @@
                 </div> <!-- card-body.// -->
             </div>
         </article> <!-- filter-group  .// -->
-        <!-- <article class="filter-group">
-            <header class="card-header">
-                <a href="#" data-toggle="collapse" data-target="#collapse_4" aria-expanded="true" class="">
-                    <i class="icon-control fa fa-chevron-down"></i>
-                    <h6 class="title">Sizes </h6>
-                </a>
-            </header>
-            <div class="filter-content collapse show" id="collapse_4" style="">
-                <div class="card-body">
-                  <label class="checkbox-btn">
-                    <input type="checkbox">
-                    <span class="btn btn-light"> XS </span>
-                  </label>
-    
-                  <label class="checkbox-btn">
-                    <input type="checkbox">
-                    <span class="btn btn-light"> SM </span>
-                  </label>
-    
-                  <label class="checkbox-btn">
-                    <input type="checkbox">
-                    <span class="btn btn-light"> LG </span>
-                  </label>
-    
-                  <label class="checkbox-btn">
-                    <input type="checkbox">
-                    <span class="btn btn-light"> XXL </span>
-                  </label>
-            </div> card-body.// 
-            </div>
-        </article> filter-group .// -->
-        
-        <article class="filter-group">
-            <header class="card-header">
-                <a href="#" data-toggle="collapse" data-target="#collapse_3" aria-expanded="true" class="">
-                    <i class="icon-control fa fa-chevron-down"></i>
-                    <h6 class="title">Price range </h6>
-                </a>
-            </header>
-            <div class="filter-content collapse show" id="collapse_3" style="">
-                <div class="card-body">
-                    
-                    <div class="form-row">
-                    <div class="form-group col-md-6">
-                      <label>Min</label>
-                      <!-- <input class="form-control" placeholder="$0" type="number"> -->
-                          <select class="mr-2 form-control">
-                            <option value="0">$0</option>
-                            <option value="50">$50</option>
-                            <option value="100">$100</option>
-                            <option value="150">$150</option>
-                            <option value="200">$200</option>
-                            <option value="500">$500</option>
-                            <option value="1000">$1000</option>
-                        </select>
-                    </div>
-                    <div class="form-group text-right col-md-6">
-                      <label>Max</label>
-                          <select class="mr-2 form-control">
-                            <option value="50">$50</option>
-                            <option value="100">$100</option>
-                            <option value="150">$150</option>
-                            <option value="200">$200</option>
-                            <option value="500">$500</option>
-                            <option value="1000">$1000</option>
-                            <option value="2000">$2000+</option>
-                        </select>
-                    </div>
-                    </div> <!-- form-row.// -->
-                    <button class="btn btn-block btn-primary">Apply</button>
-                </div><!-- card-body.// -->
-            </div>
-        </article> <!-- filter-group .// -->
         
     </div> <!-- card.// -->
     
@@ -135,8 +62,16 @@
         {% if products %}
         {% for product in products %}
         <div class="col-md-4">
-            <figure class="card card-product-grid">
+            <figure class="card card-product-grid" style="height: 450px;">
+                <!-- <a style="margin-left: 90%;margin-top: 10px;" id="hmAddtoWishlistBtn" onclick="wishList('{{product.id}}')"> <i class="fa fa-heart" style="color: red;" ></i></a> -->
                 <div class="img-wrap"> 
+                    {% if product.offer_name != None %}
+					        {% if product.stock != 0 %}
+						        <p style="color: yellowgreen;">{{product.offer_percent}}% offer</p> <!-- price-wrap.// -->
+					        {% else %}
+					            <p style="color: yellowgreen;"></p> <!-- price-wrap.// -->
+					        {% endif %}
+				    {% endif %}
                     
                 <a href="{% url 'productdetails' product.id %}">    <img src="{{ product.image1.url }}"></a>
                     
@@ -147,20 +82,23 @@
                         <a href="{% url 'productdetails' product.id %}" class="title">{{product.product_name}}</a>
                         <div class="price-wrap mt-2">
                             <span class="price">₹{{product.product_discount_price}}</span>
-                            <del class="price-old">₹{{product.product_max_price}}</del>
+                            {% if product.product_new_price != None %}
+                            <del class="price-old">₹{{product.product_new_price}}</del>
+                            {% else %}
+                            {% endif %}
                         </div> <!-- price-wrap.// -->
                     </div>
                     {% if product.stock <= 0 %}
                         <h5 style="color: red;">Out of stock</h5>
                     {% else %}
-                    {% if in_cart %}
-	                    <a href="" class="btn  btn-sucess" > <span class="text">Added to cart</span> <i class="fas fa-check"></i>  </a>
+                        {% if in_cart %}
+	                        <a href="" class="btn  btn-sucess" > <span class="text">Added to cart</span> <i class="fas fa-check"></i>  </a>
+                        {% else %}
+                            <a onclick="add_cart('{{product.id}}')"  style="width: 100%; margin-top:10px "  class="btn  btn-dark" > <span style="color: white;" class="text">Add to cart</span> <i style="color: white;" class="fas fa-shopping-cart"></i>  </a>
+                        {% endif %}
+                    {% endif %}
+                    <a id="wishicon1" onclick="wishList('{{product.id}}')"> <button class="btn" style="color: black;text-shadow: 0 0 3px #000;">Add to wishlist</button></a>	
 
-                    {% else %}
-	                    <a href="{% url 'add_cart' product.id %}" class="btn  btn-dark" > <span class="text">Add to cart</span> <i class="fas fa-shopping-cart"></i>  </a>
-                    {% endif %}
-                    {% endif %}
-                    <!-- <a href="{% url 'add_cart' product.id %}" class="btn btn-block btn-primary">Add to cart </a> -->
                 </figcaption>
             </figure>
         </div> <!-- col.// -->
@@ -206,5 +144,93 @@
     </div> <!-- container .//  -->
     </section>
     <!-- ========================= SECTION CONTENT END// ========================= -->
+
+
+    <script>
+
+        function add_cart(id){        
+            var data  = {'id': id,  "csrf_token": '{{csrf_token}}'} 
+            $.ajax({
+                url : "{% url 'add_cart'  %}",
+                method: "POST",
+                data : data,
+                success : function(data){
+                    let msg = data.success
+                    let mess = data.alert
+                    let quantity = data.cart_count
+                    let max = data.max
+                    let error = data.error
+                    if(msg){
+                        document.getElementById('cartCount').innerText = quantity
+                        swal("Item added to Cart",
+                        {
+                        icon:"success",
+                        });
+                        document.getElementById('cartCount').innerText = quantity   
+                        // $("#cart_icon").load(window.location + "#cart_icon");
+                    }
+                    else if(mess){
+                        swal({
+                            title:"Already in Cart",
+                            text:"Added the quantity",
+                              icon: "info",
+                                });
+                    }
+                    else if(max){
+                        swal({
+                            title:"Already in Cart",
+                            text:"Maximum quantity reached",
+                              icon: "info",
+                                });
+                    }
+                    else if(error){
+                        swal({
+                            title:"No stock",
+                            text:"",
+                              icon: "error",
+                                });
+                    }
+                    
+                }
+            })
+        }
+    
+    </script>
+    
+    <script>
+    
+        function wishList(id){        
+            var data  = {'id': id,  "csrf_token": '{{csrf_token}}'} 
+            $.ajax({
+                url : "{% url 'add_wishlist'  %}",
+                method: "POST",
+                data : data,
+                success : function(data){
+                    
+                    let msg = data.success
+                    let mess = data.alert
+                    let quantity = data.wish_items
+                    let errorMsg = data.error
+                    if(mess){
+                        swal("Already in Wishlist", {
+                              icon: "info",
+                                });
+                    }
+                    else if(msg && quantity ){
+                        document.getElementById('wishCount').innerText = quantity   
+                        swal("Product added to wishlist", {
+                              icon: "success",
+                                });
+                    }else{
+                        swal("You must be logged in to add to wishlist", {
+                          icon: "error",
+                            });
+                    }
+                    
+                }
+            })
+        }
+    
+    </script>
 
 {% endblock %}

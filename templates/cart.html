@@ -44,7 +44,7 @@
 							</div>
 							<input type="text" class="form-control"  value="{{cart_item.quantity}}">
 							<div class="input-group-append">
-							<a href="{% url 'add_cart' cart_item.product.id %}" class="btn btn-light" type="button" id="button-minus"> <i class="fa fa-plus"></i> </a>
+							<a href="{% url 'cart_inc' cart_item.product.id %}" class="btn btn-light" type="button" id="button-minus"> <i class="fa fa-plus"></i> </a>
 							</div>
 						</div> <!-- input-group.// -->
 					</div> <!-- col.// -->
@@ -95,6 +95,13 @@
 
 </div> <!-- row.// -->
 {% endif %}
+
+<div style="background-color: cornflowerblue;" p-7 >
+	{% for message in messages %}
+		<p style="color: black; text-align: center;">{{message}}</p>
+		{% endfor %}
+</div>
+
 <!-- ============================ COMPONENT 1 END .// ================================= -->
 
 </div> <!-- container .//  -->
@@ -147,6 +154,14 @@ function refreshPage() {
     }
 
 </script>
+<style>
+	.table th, .table td{
+		padding: 0px;
+	}
+	.table-shopping-cart.table td, .table-shopping-cart.table th{
+		padding: 0px;
+	}
+</style>
 </html>
 
 {% endblock %}

@@ -18,6 +18,19 @@
     <!-- Custom Stylesheet -->
     <link href="{% static 'adminstatic/css/style.css' %}" rel="stylesheet">
 
+    <!-- css  -->
+    <link href="{% static 'css/adminside_css.css' %}" rel="stylesheet">
+    <link href="{% static 'css/adminside2_css.css' %}" rel="stylesheet">
+
+    <!-- semantic UI -->
+    <link rel="stylesheet" type='text/css' href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.2.14/semantic.min.css">
+    <!--Chart js-->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.min.js" integrity="sha256-Uv9BNBucvCPipKQ2NS9wYpJmi8DTOEfTA/nH2aoJALw=" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.min.css" integrity="sha256-aa0xaJgmK/X74WM224KMQeNQC2xYKwlAt08oZqjeF0E=" crossorigin="anonymous" />
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+
+
 </head>
 
 <body>
@@ -47,7 +60,7 @@
         ***********************************-->
         <div class="nav-header">
             <div class="brand-logo">
-                <a href="index.html">
+                <a href="{% url 'adminlogin' %}">
                     <b class="logo-abbr"><img src="{% static 'adminstatic/images/logo.png' %}" alt=""> </b>
                     <span class="logo-compact"><img src="{% static 'adminstatic/./images/logo-compact.png' %}" alt=""></span>
                     <span class="brand-title">
@@ -232,7 +245,7 @@
                                         <li>
                                             <a href="page-lock.html"><i class="icon-lock"></i> <span>Lock Screen</span></a>
                                         </li>
-                                        <li><a href="adminlogout"><i class="icon-key"></i> <span>Logout</span></a></li>
+                                        <li><a href="{% url 'adminlogout' %}"><i class="icon-key"></i> <span>Logout</span></a></li>
                                     </ul>
                                 </div>
                             </div>
@@ -257,7 +270,7 @@
                             <i class="icon-speedometer menu-icon"></i><span class="nav-text">Dashboard</span>
                         </a>
                         <ul aria-expanded="false">
-                            <li><a href="adminhome">User Management</a></li>
+                            <li><a href="{% url 'adminhome' %}">User Management</a></li>
                             <!-- <li><a href="{% static './index-2.html">Home 2</a></li> -->
                         </ul>
                     </li>
@@ -266,12 +279,20 @@
                             <i class="icon-globe-alt menu-icon"></i><span class="nav-text">Category Management</span>
                         </a>
                         <ul aria-expanded="false">
-                            <li><a href="categoryhome">Category</a></li>
-                            <li><a href="Category">Add Category</a></li>
-                            <li><a href="subcategoryhome">SubCategory</a></li>
-                            <li><a href="SubCategory">Add SubCategory</a></li>
-                            <li><a href="productshome">Products</a></li>
-                            <li><a href="addproduct">Add Products</a></li>
+                            <li><a href="{% url 'categoryhome' %}">Category</a></li>
+                            <li><a href="{% url 'Category' %}">Add Category</a></li>
+                            <li><a href="{% url 'add_category_offer' %}">Add Category Offer</a></li>
+                            <li><a href="{% url 'subcategoryhome' %}">SubCategory</a></li>
+                            <li><a href="{% url 'SubCategory' %}">Add SubCategory</a></li>
+                            <li><a href="{% url 'productshome' %}">Products</a></li>
+                            <li><a href="{% url 'addproduct' %}">Add Products</a></li>
+                            <li><a href="{% url 'add_product_offer' %}">Add Product Offer</a></li>
+                            <li><a href="{% url 'view_brand' %}">Brand</a></li>
+                            <li><a href="{% url 'add_brand' %}">Add Brand</a></li>
+
+
+                            
+
                         </ul>
                     </li>
                     <li>
@@ -292,121 +313,31 @@
                             <li><a href="{% url 'view_offer' %}">View Offer</a></li>
                         </ul>
                     </li>
-                    <!-- <li class="nav-label">Apps</li>
                     <li>
                         <a class="has-arrow" href="javascript:void()" aria-expanded="false">
-                            <i class="icon-envelope menu-icon"></i> <span class="nav-text">Email</span>
+                            <i class="icon-speedometer menu-icon"></i><span class="nav-text">Coupon Management</span>
                         </a>
                         <ul aria-expanded="false">
-                            <li><a href="./email-inbox.html">Inbox</a></li>
-                            <li><a href="./email-read.html">Read</a></li>
-                            <li><a href="./email-compose.html">Compose</a></li>
+                            <li><a href="{% url 'add_coupon' %}">Add Coupon</a></li>
+                            <li><a href="{% url 'view_coupon' %}">View Coupon</a></li>
                         </ul>
                     </li>
                     <li>
                         <a class="has-arrow" href="javascript:void()" aria-expanded="false">
-                            <i class="icon-screen-tablet menu-icon"></i><span class="nav-text">Apps</span>
+                            <i class="icon-speedometer menu-icon"></i><span class="nav-text">Sales Management</span>
                         </a>
                         <ul aria-expanded="false">
-                            <li><a href="./app-profile.html">Profile</a></li>
-                            <li><a href="./app-calender.html">Calender</a></li>
+                            <li><a href="{% url 'sales_report' %}">Sales Report</a></li>
                         </ul>
                     </li>
                     <li>
                         <a class="has-arrow" href="javascript:void()" aria-expanded="false">
-                            <i class="icon-graph menu-icon"></i> <span class="nav-text">Charts</span>
+                            <i class="icon-speedometer menu-icon"></i><span class="nav-text">Images</span>
                         </a>
                         <ul aria-expanded="false">
-                            <li><a href="./chart-flot.html">Flot</a></li>
-                            <li><a href="./chart-morris.html">Morris</a></li>
-                            <li><a href="./chart-chartjs.html">Chartjs</a></li>
-                            <li><a href="./chart-chartist.html">Chartist</a></li>
-                            <li><a href="./chart-sparkline.html">Sparkline</a></li>
-                            <li><a href="./chart-peity.html">Peity</a></li>
-                        </ul>
-                    </li> -->
-                    <!-- <li class="nav-label">UI Components</li>
-                    <li>
-                        <a class="has-arrow" href="javascript:void()" aria-expanded="false">
-                            <i class="icon-grid menu-icon"></i><span class="nav-text">UI Components</span>
-                        </a>
-                        <ul aria-expanded="false">
-                            <li><a href="./ui-accordion.html">Accordion</a></li>
-                            <li><a href="./ui-alert.html">Alert</a></li>
-                            <li><a href="./ui-badge.html">Badge</a></li>
-                            <li><a href="./ui-button.html">Button</a></li>
-                            <li><a href="./ui-button-group.html">Button Group</a></li>
-                            <li><a href="./ui-cards.html">Cards</a></li>
-                            <li><a href="./ui-carousel.html">Carousel</a></li>
-                            <li><a href="./ui-dropdown.html">Dropdown</a></li>
-                            <li><a href="./ui-list-group.html">List Group</a></li>
-                            <li><a href="./ui-media-object.html">Media Object</a></li>
-                            <li><a href="./ui-modal.html">Modal</a></li>
-                            <li><a href="./ui-pagination.html">Pagination</a></li>
-                            <li><a href="./ui-popover.html">Popover</a></li>
-                            <li><a href="./ui-progressbar.html">Progressbar</a></li>
-                            <li><a href="./ui-tab.html">Tab</a></li>
-                            <li><a href="./ui-typography.html">Typography</a></li> -->
-                        <!-- </ul>
-                    </li>
-                    <li>
-                        <a class="has-arrow" href="javascript:void()" aria-expanded="false">
-                            <i class="icon-layers menu-icon"></i><span class="nav-text">Components</span>
-                        </a>
-                        <ul aria-expanded="false"> -->
-                         <!--   <li><a href="./uc-nestedable.html">Nestedable</a></li>
-                            <li><a href="./uc-noui-slider.html">Noui Slider</a></li>
-                            <li><a href="./uc-sweetalert.html">Sweet Alert</a></li>
-                            <li><a href="./uc-toastr.html">Toastr</a></li>              </ul>
-                    </li>
-                    <li>
-                        <a href="widgets.html" aria-expanded="false">
-                            <i class="icon-badge menu-icon"></i><span class="nav-text">Widget</span>
-                        </a>
-                    </li>
-                    <li class="nav-label">Forms</li>
-                    <li>
-                        <a class="has-arrow" href="javascript:void()" aria-expanded="false">
-                            <i class="icon-note menu-icon"></i><span class="nav-text">Forms</span>
-                        </a>
-                        <ul aria-expanded="false">
-                            <li><a href="./form-basic.html">Basic Form</a></li>
-                            <li><a href="./form-validation.html">Form Validation</a></li>
-                            <li><a href="./form-step.html">Step Form</a></li>
-                            <li><a href="./form-editor.html">Editor</a></li>
-                            <li><a href="./form-picker.html">Picker</a></li>
+                            <li><a href="{% url 'add_banner' %}">Add Banner</a></li>
                         </ul>
                     </li>
-                    <li class="nav-label">Table</li>
-                    <li>
-                        <a class="has-arrow" href="javascript:void()" aria-expanded="false">
-                            <i class="icon-menu menu-icon"></i><span class="nav-text">Table</span>
-                        </a>
-                        <ul aria-expanded="false">
-                            <li><a href="./table-basic.html" aria-expanded="false">Basic Table</a></li>
-                            <li><a href="./table-datatable.html" aria-expanded="false">Data Table</a></li>
-                        </ul>
-                    </li>
-                    <li class="nav-label">Pages</li>
-                     <li>
-                        <a class="has-arrow" href="javascript:void()" aria-expanded="false">
-                            <i class="icon-notebook menu-icon"></i><span class="nav-text">Pages</span>
-                        </a>
-                        <ul aria-expanded="false">
-                            <li><a href="./page-login.html">Login</a></li>
-                            <li><a href="./page-register.html">Register</a></li>
-                            <li><a href="./page-lock.html">Lock Screen</a></li>
-                            <li><a class="has-arrow" href="javascript:void()" aria-expanded="false">Error</a>
-                                <ul aria-expanded="false">
-                                    <li><a href="./page-error-404.html">Error 404</a></li>
-                                    <li><a href="./page-error-403.html">Error 403</a></li>
-                                    <li><a href="./page-error-400.html">Error 400</a></li>
-                                    <li><a href="./page-error-500.html">Error 500</a></li>
-                                    <li><a href="./page-error-503.html">Error 503</a></li>
-                                </ul>
-                            </li>
-                        </ul>
-                    </li> -->
                 </ul>
             </div>
         </div>
@@ -417,20 +348,9 @@
         <!--**********************************
             Content body start
         ***********************************-->
-        {% block content %}
+        {% block content%}
 
 
-
-
-
-
-
-
-
-
-
-
-        
 
         {% endblock %}
         <!--**********************************
@@ -442,7 +362,7 @@
             Footer start
         ***********************************-->
         <div class="footer">
-            <div class="copyright">
+            <div class="copyright" style="margin-top: 50%;">
                 <p>Copyright &copy; Designed & Developed by <a href="https://themeforest.net/user/quixlab">Quixlab</a> 2018</p>
             </div>
         </div>

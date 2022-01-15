@@ -19,6 +19,4 @@ urlpatterns = [
     path('change_password/',views.change_password,name='change_password'),
     path('account_details/',views.account_details,name='account_details'),
     path('cancel_order_user/<int:id>',views.cancel_order_user,name='cancel_order_user'),
-    # path('change_password_user/<int:id>',views.change_password_user, name='change_password_user')
-    # path('save_address',views.save_address,name='save_address'),
 ]

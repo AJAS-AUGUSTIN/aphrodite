@@ -17,10 +17,7 @@
     <form id="form" action="{% url 'login_with_otp' %}" method="POST">
       {% csrf_token %}
       <input type="tel" id="phone_number" class="fadeIn second" name="phone_number" placeholder="Phone Number">
-      <!-- <input type="text" id="password" class="fadeIn third" name="password" placeholder="Password"> -->
       <input type="submit" class="fadeIn fourth" style="margin-top: 30px;" value="Get OTP"><br>
-      <!-- <a href="register"> Login with OTP</a> -->
-
     </form>
     <div>
       {% for message in messages %}

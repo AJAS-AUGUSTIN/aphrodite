@@ -2,9 +2,9 @@
  <!-- navbar starts -->
 {% load static %}
 
-<header class="section-header" id="cart_list_nav">
+<header class="section-header">
     <nav class="navbar p-md-0 navbar-expand-sm navbar-light border-bottom">
-    <div class="container">
+    <div class="container" id="cartt">
       <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarTop4" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
       </button>
@@ -49,7 +49,7 @@
         </div> 
         <!-- col.// -->
         <a href="{% url 'store' %}" class="btn btn-outline-dark">Store</a>
-        <div class="col-lg  col-md-6 col-sm-12 col">
+        <div class="col-lg  col-md-6 col-sm-12 col" style="margin-right: 11px;">
             <form action="{% url 'search' %}" class="search" method="GET">
                 <div class="input-group w-100">
                     <input type="text" class="form-control" style="width:60%;" placeholder="Search" name="keyword">
@@ -62,31 +62,40 @@
                 </div>
             </form> <!-- search-wrap .end// -->
         </div> <!-- col.// -->
-        <div class="col-lg-3 col-sm-6 col-8 order-2 order-lg-3">
+        <div class="col-lg-4 col-sm-6 col-8 order-2 order-lg-3" id="cart_icon_q">
+            <div class="row col-4">
                     <div class="d-flex justify-content-end mb-3 mb-lg-0">
                         <div class="widget-header">
-                            <!-- <small class="title text-muted">Welcome guest!</small> -->
-                            <div>
                                 {% if user.is_authenticated %}
-                                <b>Welcome {{user.username}}</b><br> 
-                                <a href="{% url 'logout' %}"> Logout</a>
+                                <h5 style="margin-top: 10px;" ><b>Welcome {{user.username}}</b></h5>
+                                <!-- <a href="{% url 'logout' %}"> Logout</a> -->
                                 {% else %}
                                 <small class="title text-muted">Welcome guest!</small>
                                 <a href="{% url 'login' %}">Sign in</a> <span class="dark-transp"> | </span>
                                 <a href="{% url 'register' %}"> Register</a>
                                 {% endif %}
-                            </div>
                         </div>
-                        <a href="{% url 'cart' %}" class="widget-header pl-3 ml-3">
-                            <div class="icon icon-sm rounded-circle border"><i style="margin-top: 10px;" class="fa fa-shopping-cart"></i></div>
-                            <span class="badge badge-pill badge-danger notify">{{ cart_count }}</span>
-                        </a>
+            
+                        <div id="cart_icon">
+                            <a href="{% url 'cart' %}" class="widget-header pl-3 ml-3">
+                                <div class="icon icon-sm rounded-circle border"><i style="margin-top: 10px;" class="fa fa-shopping-cart"></i></div>
+                                <!-- <span id="cartCount" class="badge badge-pill badge-danger notify">{{ cart_count }}</span> -->
+                                <span id="cartCount" class="notify">{{ cart_count }}</span>
+                            </a>
+                        </div>
+                        <div id="wish_icon">
+                            <a href="{% url 'wishlist' %}" class="widget-header pl-3 ml-3">
+                                <div class="icon icon-sm rounded-circle border"><i style="margin-top: 10px;" class="fa fa-heart"></i></div>
+                                <span id="wishCount" class="notify">{{ wish_items }}</span>
+                            </a>
+                        </div>
                         <a href="{% url 'userdetails' %}" class="widget-header pl-3 ml-3">
                             <div class="icon icon-sm rounded-circle border"><i class="fa fa-user" aria-hidden="true"></i></div>
                             <span class="badge badge-pill badge-danger notify"></span>
                         </a>
                     </div> <!-- widgets-wrap.// -->
                 </div> <!-- col.// -->
+            </div>
     </div> <!-- row.// -->
         </div> <!-- container.// -->
     </section> <!-- header-main .// -->

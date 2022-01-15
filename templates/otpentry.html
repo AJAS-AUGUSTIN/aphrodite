@@ -20,31 +20,12 @@
 <form action="{% url 'check_otp' phone_number %}" method="POST">
       {% csrf_token %}
       <input type="number" id="otp" class="fadeIn second" name="otp" placeholder="Enter OTP Number">
-      <!-- <input type="text" id="password" class="fadeIn third" name="password" placeholder="Password"> -->
       <input type="submit" class="fadeIn fourth" style="margin-top: 30px;" value="Enter OTP"><br>
-      <!-- <a href="register"> Login with OTP</a> -->
-
     </form>
   
 </div>
 </body>
 </html>
-
-
-
-<!-- <form action="" method="POST">
-  {% csrf_token %}
-  <input type="text" name="username" placeholder="User Name"><br>
-  <input type="password" name="password" placeholder="Password"><br>
-  <input type="submit" value="login">
-
-</form>
-
-<div>
-  {% for message in messages %}
-  <h3>{{ message }}</h3>
-  {% endfor %}
-</div> -->
 
 <style>
 
