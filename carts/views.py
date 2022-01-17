@@ -248,7 +248,11 @@ def place_order(request):
     current_user = request.user
 
     if request.method == 'POST':
-        address = request.POST['address']
+        try:
+            address = request.POST['address']
+        except:
+            messages.info(request, 'Address Required')
+            return redirect('checkout')
         address_data = Address.objects.get(id=address)
         if request.POST.get('payment_method') == 'cash_on_delivery':
             payment_method  = request.POST['payment_method']

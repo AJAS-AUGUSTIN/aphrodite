@@ -29,6 +29,9 @@ def login(request):
         username = request.POST['username']
         password = request.POST['password']
         user = auth.authenticate(username=username, password=password)
+        if user is None:
+            messages.info(request,'Invalid Credentials')
+            return redirect('login')
         request.session['username'] = True
         auth.login(request, user)
         if user is not None:

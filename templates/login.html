@@ -27,13 +27,15 @@
               <button type="submit" value="login" class="btn btn-primary btn-block"> Login  </button>
           </div> <!-- form-group// -->    
       </form>
+      {% for message in messages %}
+      <h3>{{ message }}</h3>
+      {% endfor %}
       </div> <!-- card-body.// -->
     </div> <!-- card .// -->
 
      <p class="text-center mt-4">Don't have account? <a href="/register">Sign up</a></p>
      <br><br>
 <!-- ============================ COMPONENT LOGIN  END.// ================================= -->
-
 
 </section>
 <!-- ========================= SECTION CONTENT END// ========================= -->
